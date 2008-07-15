@@ -1,4 +1,4 @@
-package AddDocuments;
+package WebService::Solr::AddDocuments;
 use strict;
 use warnings;
 require XML::Generator;
@@ -13,6 +13,7 @@ sub new {
 }
 # Base code for adding documents. Will require input and loops for practical use but this works! :-)
     my $gen = XML::Generator->new(':pretty');
+    # Set the attributes to their default values. 
     my $allowDups = 'false';
     my $fieldBoost ='1.0';
     my $docBoost ='1.0';

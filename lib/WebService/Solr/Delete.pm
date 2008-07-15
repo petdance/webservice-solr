@@ -1,7 +1,7 @@
-package Delete;
+package WebService::Solr::Delete;
 use XML::Generator;
 # Inheriting from Update package
-use base qw(Update);
+#use base qw(Update);
 use strict;
 use warnings;
 
@@ -17,6 +17,7 @@ sub new {
         bless $self, $class;
         return $self;
 }
+
 sub delete_by_id{
     my $self = shift;
     my $opts = $self->{opts};
@@ -24,16 +25,18 @@ sub delete_by_id{
     my $gen = XML::Generator->new(':pretty');
     my $id ='';
     
+    print "The # of items in the hash is keys(%opthash)"."\n";
+
     if ($optshash{'id'}||die "An id must be provided for deletion! "){
         $id  = $optshash{'id'}; 
     }
+    
     print $gen->delete(
         $gen->id($id),
     );
     print "\n";   
-       
-     
 }
+
 sub delete_by_query{
     my $self = shift;
     my $opts = $self->{opts};
@@ -50,8 +53,4 @@ sub delete_by_query{
     print "\n"; 
 }
 
-package main;
-my %options = (query =>'office:Bridgewater');
-my $d = Delete->new( %options );
-my $t = $d->delete_by_query;
-print $t;
+

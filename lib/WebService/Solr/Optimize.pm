@@ -1,8 +1,6 @@
-package Optimize;
+package WebService::Solr::Optimize;
 use XML::Generator;
 use Tie::IxHash;
-# Inheriting from Update package
-#@ISA = qw(Update);
 use strict;
 use warnings;
 
@@ -15,8 +13,8 @@ sub new {
         bless $self, $class;
         return $self;
 }
-
-sub to_s {
+1;
+sub toString {
     my $self = shift;
     my $opts = $self->{opts};
     my %optshash = %$opts;
@@ -28,12 +26,6 @@ sub to_s {
            waitSearcher => $waitSearcher,
            );
     my $func = $gen->optimize(\%attr); 
-    #print $gen->optimize(\%attr);   
     return $func;   
      
 }
-package main;
-my %options = ( waitFlush =>'false', waitSearcher=>'true' );
-my $c = Optimize->new( %options );
-my $t = $c->to_s;
-print $t;

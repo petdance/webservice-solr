@@ -2,20 +2,29 @@ package WebService::Solr::Delete;
 use XML::Generator;
 use strict;
 use warnings;
-
 sub new {
     my ( $class, %options ) = @_;
-    if (\%options{'id'} && \options{'query'}){
+    if ($options{'id'} && $options{'query'}){
         die "Must delete by id OR query, not both";
     }
+#    print "Here it is : ";
     my $self = {
         opts => \%options
     };
          
         bless $self, $class;
         return $self;
+
 }
 1;
+sub response_format{
+    my $self = shift; 
+    return 'xml';
+}
+sub handler{
+    my $self = shift;
+    return 'update';
+}
 sub delete_by_id{
     my $self = shift;
     my $opts = $self->{opts};
@@ -24,16 +33,16 @@ sub delete_by_id{
     my $gen = XML::Generator->new(':pretty');
     my $id ='';
     
-    print "The # of items in the hash is keys(%opthash)"."\n";
+#    print "The # of items in the hash is keys(%opthash)"."\n";
 
     if ($optshash{'id'}||die "An id must be provided for deletion! "){
         $id  = $optshash{'id'}; 
     }
     
-    print $gen->delete(
+    return $gen->delete(
         $gen->id($id),
     );
-    print "\n";   
+     
 }
 
 sub delete_by_query{
@@ -46,16 +55,5 @@ sub delete_by_query{
     if ($optshash{'query'}||die "A query must be provided for deletion! "){
         $query  = $optshash{'query'}; 
     }
-    print $gen->delete(
-        $gen->query($query),
-    );  
-    print "\n"; 
+    $gen->delete($gen->query($query),);  
 }
-package main;
-use strict;
-use warnings;
-use XML::Generator;
-my %opt_3 = (id=>"0001");
-my $delete_3 = WebService::Solr::Delete->new(%opt_3);
-my $got_3 = WebService::Solr::Delete->delete_by_id;
-

@@ -1,4 +1,4 @@
-use Test::More tests=>6;
+use Test::More tests=>5;
 use strict;
 use warnings;
 # Test 1
@@ -14,7 +14,7 @@ BEGIN { use_ok( 'WebService::Solr::Delete' ); }
 }
 
 # Test 3 
-BEGIN { use_ok( 'WebService::Solr::Delete' ); }
+
 {
     my %p =(query=>'name:DDR');
     my $f = WebService::Solr::Delete->new(%p);

@@ -1,5 +1,6 @@
 package WebService::Solr::Delete;
 use XML::Generator;
+use base qw(WebService::Solr::Update);
 use strict;
 use warnings;
 sub new {
@@ -17,14 +18,6 @@ sub new {
 
 }
 1;
-sub response_format{
-    my $self = shift; 
-    return 'xml';
-}
-sub handler{
-    my $self = shift;
-    return 'update';
-}
 sub delete_by_id{
     my $self = shift;
     my $opts = $self->{opts};

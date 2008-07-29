@@ -1,6 +1,7 @@
 package WebService::Solr::Commit;
 use XML::Generator;
 use Tie::IxHash;
+use base qw(WebService::Solr::Update);
 use strict;
 use warnings;
 

@@ -1,6 +1,5 @@
 package WebService::Solr::Delete;
 use XML::Generator;
-use base qw(WebService::Solr::Update);
 use strict;
 use warnings;
 sub new {

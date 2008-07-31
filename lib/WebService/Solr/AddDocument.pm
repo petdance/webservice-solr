@@ -1,7 +1,6 @@
 package WebService::Solr::AddDocument;
 use WebService::Solr::Document;
 require XML::Generator;
-use base qw(WebService::Solr::Update);
 use strict;
 use warnings;
 

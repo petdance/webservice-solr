@@ -39,7 +39,8 @@ sub to_xml{
     
     my $gen = XML::Generator->new(':pretty');
 
-   $gen->field({name=>$name,boost=>$boost},$value);
+   my $str = $gen->field({name=>$name,boost=>$boost},$value);
+    return "$str";
     
 }
 

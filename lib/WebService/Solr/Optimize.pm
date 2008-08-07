@@ -14,7 +14,7 @@ sub new {
         return $self;
 }
 1;
-sub toString {
+sub to_xml {
     my $self = shift;
     my $opts = $self->{opts};
     my %optshash = %$opts;
@@ -26,6 +26,6 @@ sub toString {
            waitSearcher => $waitSearcher,
            );
     my $func = $gen->optimize(\%attr); 
-    return $func;   
+    return "$func";   
      
 }

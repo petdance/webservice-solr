@@ -18,7 +18,7 @@ sub new{
         bless $self,$class;
         return $self;
 }
-
+1;
 sub to_xml{
     # Creates one document for the array of fields.
     my ($self, $fields)=@_; 
@@ -27,7 +27,7 @@ sub to_xml{
     my $field;
     my $fieldHolder ='';
      foreach $field (@$fields) {
-        $fieldHolder = $fieldHolder."\n".$field->to_xml;
+        $fieldHolder = $fieldHolder.$field->to_xml;
      }
        
     my $boost ='';
@@ -37,9 +37,9 @@ sub to_xml{
         }else{
             $boost = '1.0';
         }
-    my $gen = XML::Generator->new(pretty => "\t");
-    my $xmlString = $gen->doc( {boost=>$boost},$fieldHolder."\n");
-    return $xmlString;
+    my $gen = XML::Generator->new();
+    my $xmlString = $gen->doc( {boost=>$boost},$fieldHolder);
+    return "$xmlString";
    
 }
-1;
+

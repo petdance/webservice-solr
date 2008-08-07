@@ -9,7 +9,7 @@ sub new{
     };
     bless $self,$class;
     return $self;
-}
+}1;
 sub solrUrl{
     my ($self)=@_;
     my $comParams = $self->{comUrlParams}; 
@@ -28,4 +28,4 @@ sub selectUrl{
     my $selectUrl = $self->solrUrl."select/";
     return $selectUrl;
 }
-1;
+

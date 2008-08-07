@@ -3,13 +3,13 @@ use XML::Generator;
 use strict;
 use warnings;
 sub new {
-    my ( $class, %options ) = @_;
-    if ($options{'id'} && $options{'query'}){
+    my ( $class, $options ) = @_;
+    if ($options->{'id'} && $options->{'query'}){
         die "Must delete by id OR query, not both";
     }
 #    print "Here it is : ";
     my $self = {
-        opts => \%options
+        opts => $options
     };
          
         bless $self, $class;
@@ -21,31 +21,28 @@ sub delete_by_id{
     my $self = shift;
     my $opts = $self->{opts};
      die "Expected hash reference for WebService::Solr::Delete->delete_by_id " unless ref($opts) eq "HASH";
-    my %optshash = %$opts;
-    my $gen = XML::Generator->new(':pretty');
+    my $gen = XML::Generator->new();
     my $id ='';
-    
-#    print "The # of items in the hash is keys(%opthash)"."\n";
-
-    if ($optshash{'id'}||die "An id must be provided for deletion! "){
-        $id  = $optshash{'id'}; 
+    if ($opts->{'id'}||die "An id must be provided for deletion! "){
+        $id  = $opts->{'id'}; 
     }
     
-    return $gen->delete(
+    my $del = $gen->delete(
         $gen->id($id),
     );
-     
+    return "$del"; 
 }
 
 sub delete_by_query{
     my $self = shift;
     my $opts = $self->{opts};
-    my %optshash = %$opts;
+    #my %optshash = %$opts;
     my $gen = XML::Generator->new(':pretty');
     my $query ='';
     
-    if ($optshash{'query'}||die "A query must be provided for deletion! "){
-        $query  = $optshash{'query'}; 
+    if ($opts->{'query'}||die "A query must be provided for deletion! "){
+        $query  = $opts->{'query'}; 
     }
-    $gen->delete($gen->query($query),);  
+    my $del = $gen->delete($gen->query($query),);
+    return "$del";  
 }

@@ -21,7 +21,7 @@ sub addXMLDocument{
     my $opts = $self->{opts};
     my $allowDups='false';
     my $str = '';
-    my $gen = XML::Generator->new(pretty => "\t");
+    my $gen = XML::Generator->new();
     if($opts->{'allowDups'}){
             $allowDups= $opts->{'allowDups'};
     }
@@ -29,7 +29,7 @@ sub addXMLDocument{
  $str = $gen->add({allowDups => $allowDups},
             $strXMLDocs
          );
-    return $str;
+    return "$str";
 }
 sub addXMLDocuments{
     my ($self,$arrDocuments) = @_;
@@ -46,7 +46,7 @@ sub addXMLDocuments{
         $documentHolder = $documentHolder."\n".$document;
      }
     $str = $gen->add({allowDups => $allowDups},$documentHolder);
-    return $str;
+    return "$str";
    
 }
 1;

@@ -5,42 +5,47 @@ use Class::Accessor;
 use warnings;
 use strict;
 
-sub new{
-    my ( $class, %params ) = @_;
+sub new {
+    my ( $class, $params ) = @_;
+
     # Accepts a hash of fields.
-    my $self = {
-        params=>\%params
-    };
-    bless $self,$class;
+    my $self = { params => $params };
+    bless $self, $class;
     return $self;
 
 }
 1;
-sub to_xml{
-    my $self = shift;
-    my $params = $self->{params};
-    my %paramshash = %$params;
-    my $name = '';
-    my $value= '';
-    my $boost= '';
+
+sub to_xml {
+    my $self   = shift;
+    my $params = $self->{ params };
+    my $name   = '';
+    my $value  = '';
+    my $boost  = '';
+
     # If boost has no value then set to default 1.0
     # Look for values of 'name' and 'value' attributes.
-    if($paramshash{'boost'}){
-            $boost= $paramshash{'boost'};
-        }else{
-            $boost = '1.0';
-        }
-    if($paramshash{'value'}||die "The field attribute 'value' is missing a value! "){
-        $value  = $paramshash{'value'}; 
+    if ( $params->{ 'boost' } ) {
+        $boost = $params->{ 'boost' };
     }
-    if($paramshash{'name'}||die "The field attribute 'name' is missing a value! "){
-        $name  = $paramshash{'name'}; 
+    else {
+        $boost = '1.0';
     }
-    
-    my $gen = XML::Generator->new(':pretty');
+    if ( $params->{ 'value' }
+        || die "The field attribute 'value' is missing a value! " )
+    {
+        $value = $params->{ 'value' };
+    }
+    if ( $params->{ 'name' }
+        || die "The field attribute 'name' is missing a value! " )
+    {
+        $name = $params->{ name };
+    }
 
-   my $str = $gen->field({name=>$name,boost=>$boost},$value);
+    my $gen = XML::Generator->new();
+
+    my $str = $gen->field( { name => $name, boost => $boost }, $value );
     return "$str";
-    
+
 }
 

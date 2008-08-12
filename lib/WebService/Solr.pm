@@ -9,6 +9,8 @@ use HTTP::Headers;
 use strict;
 use warnings;
 
+our $VERSION = '0.01';
+
 sub new {
     my ( $class, $url ) = @_;
     my $self = { url => $url, };

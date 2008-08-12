@@ -8,6 +8,7 @@ name 'WebService-Solr';
 all_from 'lib/WebService/Solr.pm';
 
 requires 'XML::Generator';
+requires 'LWP::UserAgent';
 
 test_requires 'Test::More';
 

@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use XML::Generator;
-use Tie::IxHash;
 
 sub new {
     my ( $class, %options ) = @_;
@@ -19,10 +18,9 @@ sub to_xml {
     my $opts     = $self->{ opts };
     my %optshash = %$opts;
     my $gen      = XML::Generator->new( ':pretty' );
-    tie my %attr, 'Tie::IxHash';
     my $waitFlush    = $optshash{ 'waitFlush' };
     my $waitSearcher = $optshash{ 'waitSearcher' };
-    %attr = (
+    my %attr = (
         waitFlush    => $waitFlush,
         waitSearcher => $waitSearcher,
     );

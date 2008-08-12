@@ -1,11 +1,10 @@
 package WebService::Solr::Document;
-use Solr::Field;
-use XML::Generator;
-use XML::Generator escape => 'always';
-use Tie::IxHash;
-use Data::Dumper;
-use warnings;
+
 use strict;
+use warnings;
+
+use WebService::Solr::Field;
+use XML::Generator escape => 'always';
 
 sub new {
 

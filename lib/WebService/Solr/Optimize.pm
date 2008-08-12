@@ -1,8 +1,10 @@
 package WebService::Solr::Optimize;
-use XML::Generator;
-use Tie::IxHash;
+
 use strict;
 use warnings;
+
+use XML::Generator;
+use Tie::IxHash;
 
 sub new {
     my ( $class, %options ) = @_;
@@ -11,7 +13,6 @@ sub new {
     bless $self, $class;
     return $self;
 }
-1;
 
 sub to_xml {
     my $self     = shift;
@@ -29,3 +30,5 @@ sub to_xml {
     return "$func";
 
 }
+
+1;

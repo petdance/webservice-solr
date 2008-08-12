@@ -1,9 +1,9 @@
 package WebService::Solr::Field;
-use XML::Generator;
-use Tie::IxHash;
-use Class::Accessor;
-use warnings;
+
 use strict;
+use warnings;
+
+use XML::Generator;
 
 sub new {
     my ( $class, $params ) = @_;

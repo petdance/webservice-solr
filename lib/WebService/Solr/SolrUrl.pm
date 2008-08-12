@@ -8,7 +8,6 @@ sub new {
     bless $self, $class;
     return $self;
 }
-1;
 
 sub solrUrl {
     my ( $self )  = @_;
@@ -31,3 +30,4 @@ sub selectUrl {
     return $selectUrl;
 }
 
+1;

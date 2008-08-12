@@ -1,7 +1,9 @@
 package WebService::Solr::Delete;
-use XML::Generator;
+
 use strict;
 use warnings;
+
+use XML::Generator;
 
 sub new {
     my ( $class, $options ) = @_;
@@ -16,7 +18,6 @@ sub new {
     return $self;
 
 }
-1;
 
 sub delete_by_id {
     my $self = shift;
@@ -48,3 +49,6 @@ sub delete_by_query {
     my $del = $gen->delete( $gen->query( $query ), );
     return "$del";
 }
+
+1;
+

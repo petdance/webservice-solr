@@ -1,8 +1,10 @@
 package WebService::Solr::AddDocument;
-use WebService::Solr::Document;
-require XML::Generator;
+
 use strict;
 use warnings;
+
+use WebService::Solr::Document;
+require XML::Generator;
 
 sub new {
     my ( $class, $options ) = @_;

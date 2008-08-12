@@ -1,4 +1,8 @@
 package WebService::Solr;
+
+use strict;
+use warnings;
+
 use WebService::Solr::Commit;
 use WebService::Solr::Optimize;
 use WebService::Solr::Delete;
@@ -6,8 +10,6 @@ use WebService::Solr::CoreQueryParameters;
 use LWP::UserAgent;
 use HTTP::Request;
 use HTTP::Headers;
-use strict;
-use warnings;
 
 our $VERSION = '0.01';
 

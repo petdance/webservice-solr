@@ -8,6 +8,7 @@ use WebService::Solr::Optimize;
 use WebService::Solr::Delete;
 use WebService::Solr::CoreQueryParameters;
 use LWP::UserAgent;
+use URI;
 use HTTP::Request;
 use HTTP::Headers;
 
@@ -15,7 +16,8 @@ our $VERSION = '0.01';
 
 sub new {
     my ( $class, $url ) = @_;
-    my $self = { url => $url, };
+    $url ||= 'http://localhost:8983/solr/';
+    my $self = { url => URI->new( $url ), };
     bless $self, $class;
     return $self;
 }

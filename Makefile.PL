@@ -7,8 +7,9 @@ if( -e 'MANIFEST.SKIP' ) {
 name 'WebService-Solr';
 all_from 'lib/WebService/Solr.pm';
 
-requires 'XML::Generator';
 requires 'LWP::UserAgent';
+requires 'URI';
+requires 'XML::Generator';
 
 test_requires 'Test::More';
 

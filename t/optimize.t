@@ -1,62 +1,30 @@
-use Test::More tests => 8;
 use strict;
 use warnings;
-# Tests 1
-BEGIN { use_ok( 'WebService::Solr::Optimize' ); }
-  
-# Test Hash 2
-{
-    my $expected = '<optimize waitFlush="true" waitSearcher="true" />';
-    my %opts =(waitFlush=>'true',waitSearcher=>'true');
-    my $optimize = WebService::Solr::Optimize->new(%opts);
-    my $got = $optimize->toString;
-    ok($got eq $expected, 'true and true');
+use Test::More tests => 8;
+use XML::Simple;
+
+BEGIN {
+    use_ok( 'WebService::Solr::Optimize' );
 }
-# Test Hash 3
+
+my @tests = (
+    { waitFlush => 'true',  waitSearcher => 'true' },
+    { waitFlush => 'true',  waitSearcher => 'false' },
+    { waitFlush => 'false', waitSearcher => 'true' },
+    { waitFlush => 'false', waitSearcher => 'false' },
+    { waitFlush => '',      waitSearcher => 'false' },
+    { waitFlush => 'false', waitSearcher => '' },
+    { waitFlush => '',      waitSearcher => '' },
+);
+
 {
-    my $expected = '<optimize waitFlush="true" waitSearcher="false" />';
-    my %opts =(waitFlush=>'true',waitSearcher=>'false');
-    my $optimize = WebService::Solr::Optimize->new(%opts);
-    my $got = $optimize->toString;
-    ok($got eq $expected, 'true and false');
+    cmp_xml( $_ ) for @tests;
 }
-# Test Hash 4
-{
-    my $expected = '<optimize waitFlush="false" waitSearcher="true" />';
-    my %opts =(waitFlush=>'false',waitSearcher=>'true');
-    my $optimize = WebService::Solr::Optimize->new(%opts);
-    my $got = $optimize->toString;
-    ok($got eq $expected, 'false and true');
-}
-# Test Hash 5
-{
-    my $expected = '<optimize waitFlush="false" waitSearcher="false" />';
-    my %opts =(waitFlush=>'false',waitSearcher=>'false');
-    my $optimize = WebService::Solr::Optimize->new(%opts);
-    my $got = $optimize->toString;
-    ok($got eq $expected, 'false and false');
-}
-# Test Hash 6
-{
-    my $expected = '<optimize waitFlush="" waitSearcher="false" />';
-    my %opts =(waitFlush=>'',waitSearcher=>'false');
-    my $optimize = WebService::Solr::Optimize->new(%opts);
-    my $got = $optimize->toString;
-    ok($got eq $expected, 'waitFlush missing');
-}
-# Test Hash 7
-{
-    my $expected = '<optimize waitFlush="false" waitSearcher="" />';
-    my %opts =(waitFlush=>'false',waitSearcher=>'');
-    my $optimize = WebService::Solr::Optimize->new(%opts);
-    my $got = $optimize->toString;
-    ok($got eq $expected, 'waitSearcher missing');
-}
-# Test Hash 8
-{
-    my $expected = '<optimize waitFlush="" waitSearcher="" />';
-    my %opts =(waitFlush=>'',waitSearcher=>'');
-    my $optimize = WebService::Solr::Optimize->new(%opts);
-    my $got= $optimize->toString;
-    ok($got eq $expected, 'both optimize attributes missing');
+
+sub cmp_xml {
+    my ( $opts ) = @_;
+    my $obj = WebService::Solr::Optimize->new( %$opts );
+    my $got = XMLin( $obj->to_xml, KeepRoot => 1 );
+
+    is_deeply( $got, { optimize => $opts } );
 }

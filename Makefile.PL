@@ -12,6 +12,7 @@ requires 'URI';
 requires 'XML::Generator';
 
 test_requires 'Test::More';
+test_requires 'XML::Simple';
 
 auto_install;
 WriteAll;

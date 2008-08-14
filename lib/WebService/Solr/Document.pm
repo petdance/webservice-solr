@@ -27,7 +27,7 @@ sub to_xml {
     my $field;
     my $fieldHolder = '';
     foreach $field ( @$fields ) {
-        $fieldHolder = $fieldHolder . "" . $field;
+        $fieldHolder = $fieldHolder ."". $field->to_xml;
     }
 
     my $boost = '';

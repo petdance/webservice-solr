@@ -7,7 +7,7 @@ BEGIN { use_ok( 'WebService::Solr::Delete' ); }
 # Test 2
 {
     my %p =(id=>'1234');
-    my $f = WebService::Solr::Delete->new(%p);
+    my $f = WebService::Solr::Delete->new(\%p);
     my $got=$f->delete_by_id; 
 
     like( $got, qr{<delete>\s*<id>1234</id>\s*</delete>}, 'xml id ok' );
@@ -17,7 +17,7 @@ BEGIN { use_ok( 'WebService::Solr::Delete' ); }
 
 {
     my %p =(query=>'name:DDR');
-    my $f = WebService::Solr::Delete->new(%p);
+    my $f = WebService::Solr::Delete->new(\%p);
     my $got=$f->delete_by_query; 
 
     like( $got, qr{<delete>\s*<query>name:DDR</query>\s*</delete>}, 'xml query ok' );
@@ -29,7 +29,7 @@ BEGIN { use_ok( 'WebService::Solr::Delete' ); }
     my $f;
     my $got;
     eval{
-         $f = WebService::Solr::Delete->new(%p);   
+         $f = WebService::Solr::Delete->new(\%p);   
          $got=$f->delete_by_id;
     };
     ok($@,'Both id and query present for delete_by_id');    
@@ -40,8 +40,9 @@ BEGIN { use_ok( 'WebService::Solr::Delete' ); }
     my $f;
     my $got;
     eval{
-         $f = WebService::Solr::Delete->new(%p);   
+         $f = WebService::Solr::Delete->new(\%p);   
          $got=$f->delete_by_query;
     };
     ok($@,'Both id and query present for delete_by_query');    
 }
+

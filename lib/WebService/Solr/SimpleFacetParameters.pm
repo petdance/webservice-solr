@@ -11,7 +11,7 @@ sub new {
 
 # Unless the facet param is true then none of these variables matter
 # facet must be true to turn on faceting.
-sub getFacet {
+sub get_facet {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -21,7 +21,7 @@ sub getFacet {
     return $Str;
 }
 
-sub getFacet_Query {
+sub get_facet_query {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -31,7 +31,7 @@ sub getFacet_Query {
     return $Str;
 }
 
-sub getFacet_Field {
+sub get_facet_field {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -41,7 +41,7 @@ sub getFacet_Field {
     return $Str;
 }
 
-sub getFacet_Prefix {
+sub get_facet_prefix {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -51,7 +51,7 @@ sub getFacet_Prefix {
     return $Str;
 }
 
-sub getFacet_Sort {
+sub get_facet_sort {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -61,7 +61,7 @@ sub getFacet_Sort {
     return $Str;
 }
 
-sub getFacet_Limit {
+sub get_facet_limit {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -71,7 +71,7 @@ sub getFacet_Limit {
     return $Str;
 }
 
-sub getFacet_Offset {
+sub get_facet_offset {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -81,7 +81,7 @@ sub getFacet_Offset {
     return $Str;
 }
 
-sub getFacet_MinCount {
+sub get_facet_min_count {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -91,7 +91,7 @@ sub getFacet_MinCount {
     return $Str;
 }
 
-sub getFacet_Missing {
+sub get_facet_missing {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -101,7 +101,7 @@ sub getFacet_Missing {
     return $Str;
 }
 
-sub getFacet_Enum_Cache_MinDf {
+sub get_facet_enum_cache_min_df {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -113,7 +113,7 @@ sub getFacet_Enum_Cache_MinDf {
 }
 
 # When using Date Faceting, facet.date, facet.date.start, facet.date.end, facet.date.gap params are all mandatory
-sub getFacet_Date {
+sub get_facet_date {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -123,7 +123,7 @@ sub getFacet_Date {
     return $Str;
 }
 
-sub getFacet_Date_Start {
+sub get_facet_date_start {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -133,7 +133,7 @@ sub getFacet_Date_Start {
     return $Str;
 }
 
-sub getFacet_Date_End {
+sub get_facet_date_end {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -143,7 +143,7 @@ sub getFacet_Date_End {
     return $Str;
 }
 
-sub getFacet_Date_Gap {
+sub get_facet_date_gap {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -153,7 +153,7 @@ sub getFacet_Date_Gap {
     return $Str;
 }
 
-sub getFacet_Date_Hardened {
+sub get_facet_date_hardened {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -163,7 +163,7 @@ sub getFacet_Date_Hardened {
     return $Str;
 }
 
-sub getFacet_Date_Other {
+sub get_facet_date_other {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';
@@ -173,7 +173,7 @@ sub getFacet_Date_Other {
     return $Str;
 }
 
-sub getFacet_Zeros {
+sub get_facet_zeros {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $Str      = '';

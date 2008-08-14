@@ -9,7 +9,7 @@ sub new {
     return $self;
 }
 
-sub getSort {
+sub get_sort {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $qStr     = '';
@@ -19,7 +19,7 @@ sub getSort {
     return $qStr;
 }
 
-sub getStart {
+sub get_start {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $qStr     = '';
@@ -29,7 +29,7 @@ sub getStart {
     return $qStr;
 }
 
-sub getRows {
+sub get_rows {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $qStr     = '';
@@ -39,7 +39,7 @@ sub getRows {
     return $qStr;
 }
 
-sub getFieldQuery {
+sub get_field_query {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $qStr     = '';
@@ -49,7 +49,7 @@ sub getFieldQuery {
     return $qStr;
 }
 
-sub getFieldList {
+sub get_field_list {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $qStr     = '';
@@ -59,7 +59,7 @@ sub getFieldList {
     return $qStr;
 }
 
-sub getDebugQuery {
+sub get_debug_query {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $qStr     = '';
@@ -69,7 +69,7 @@ sub getDebugQuery {
     return $qStr;
 }
 
-sub getExplainOther {
+sub get_explain_other {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $qStr     = '';

@@ -15,7 +15,7 @@ sub new {
     return $self;
 }
 
-sub addXMLDocument {
+sub add_xml_document {
 
     # Accepts a string in xml format of doc and field tags to be
     # wrapped with an <add></add> tag.
@@ -32,7 +32,7 @@ sub addXMLDocument {
     return "$str";
 }
 
-sub addXMLDocuments {
+sub add_xml_documents {
     my ( $self, $arrDocuments ) = @_;
     my $opts           = $self->{ opts };
     my $allowDups      = 'false';
@@ -44,7 +44,7 @@ sub addXMLDocuments {
         $allowDups = $opts->{ 'allowDups' };
     }
     foreach $document ( @$arrDocuments ) {
-        $documentHolder = $documentHolder . "\n" . $document;
+        $documentHolder = $documentHolder ."". $document;
     }
     $str = $gen->add( { allowDups => $allowDups }, $documentHolder );
     return "$str";

@@ -17,10 +17,9 @@ sub new {
 sub to_xml {
     my $self = shift;
     my $opts = $self->{ opts };
-    die "Expected hash reference for WebService::Solr::Commit->toString "
+    die 'Expected hash reference for WebService::Solr::Commit->to_xml'
         unless ref( $opts ) eq "HASH";
 
-    #my %optshash = %$opts;
     my $gen = XML::Generator->new();
 
     my $waitFlush    = $opts->{ 'waitFlush' };
@@ -33,6 +32,4 @@ sub to_xml {
     return "$func";
 
 }
-
 1;
-

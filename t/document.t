@@ -34,15 +34,15 @@ my %fields8 = (name=>'',value=>'',boost=>'7.1');
 
 my %fields9 = (name=>'',value=>'',boost=>'');
 
-my $f1 = WebService::Solr::Field->new(%fields1);
-my $f2 = WebService::Solr::Field->new(%fields2);
-my $f3 = WebService::Solr::Field->new(%fields3);
-my $f4 = WebService::Solr::Field->new(%fields4);
-my $f5 = WebService::Solr::Field->new(%fields5);
-my $f6 = WebService::Solr::Field->new(%fields6);
-my $f7 = WebService::Solr::Field->new(%fields7);
-my $f8 = WebService::Solr::Field->new(%fields8);
-my $f9 = WebService::Solr::Field->new(%fields9);
+my $f1 = WebService::Solr::Field->new(\%fields1);
+my $f2 = WebService::Solr::Field->new(\%fields2);
+my $f3 = WebService::Solr::Field->new(\%fields3);
+my $f4 = WebService::Solr::Field->new(\%fields4);
+my $f5 = WebService::Solr::Field->new(\%fields5);
+my $f6 = WebService::Solr::Field->new(\%fields6);
+my $f7 = WebService::Solr::Field->new(\%fields7);
+my $f8 = WebService::Solr::Field->new(\%fields8);
+my $f9 = WebService::Solr::Field->new(\%fields9);
 
 # Test 3
 {

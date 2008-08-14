@@ -23,7 +23,7 @@ my @tests = (
 
 sub cmp_xml {
     my ( $opts ) = @_;
-    my $obj = WebService::Solr::Optimize->new( %$opts );
+    my $obj = WebService::Solr::Optimize->new( $opts );
     my $got = XMLin( $obj->to_xml, KeepRoot => 1 );
 
     is_deeply( $got, { optimize => $opts } );

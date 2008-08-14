@@ -6,8 +6,9 @@ use warnings;
 use XML::Generator;
 
 sub new {
-    my ( $class, %options ) = @_;
-    my $self = { opts => \%options };
+    my ( $class, $options ) = @_;
+    
+    my $self = { opts => $options };
 
     bless $self, $class;
     return $self;
@@ -16,10 +17,13 @@ sub new {
 sub to_xml {
     my $self     = shift;
     my $opts     = $self->{ opts };
-    my %optshash = %$opts;
-    my $gen      = XML::Generator->new( ':pretty' );
-    my $waitFlush    = $optshash{ 'waitFlush' };
-    my $waitSearcher = $optshash{ 'waitSearcher' };
+    die 'Expected hash reference for WebService::Solr::Commit->to_xml'
+        unless ref( $opts ) eq "HASH";
+    
+    my $gen = XML::Generator->new();   
+
+    my $waitFlush    = $opts->{ 'waitFlush' };
+    my $waitSearcher = $opts->{ 'waitSearcher' };
     my %attr = (
         waitFlush    => $waitFlush,
         waitSearcher => $waitSearcher,

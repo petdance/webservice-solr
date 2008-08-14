@@ -9,7 +9,7 @@ sub new {
     return $self;
 }
 
-sub getQueryType {
+sub get_query_type {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $qStr     = '';
@@ -19,7 +19,7 @@ sub getQueryType {
     return $qStr;
 }
 
-sub getWriterType {
+sub get_writer_type {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $qStr     = '';
@@ -29,7 +29,7 @@ sub getWriterType {
     return $qStr;
 }
 
-sub getEchoHandler {
+sub get_echo_handler {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $qStr     = '';
@@ -39,7 +39,7 @@ sub getEchoHandler {
     return $qStr;
 }
 
-sub getEchoParams {
+sub get_echo_params {
     my ( $self ) = @_;
     my $params   = $self->{ params };
     my $qStr     = '';

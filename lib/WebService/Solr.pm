@@ -3,6 +3,8 @@ package WebService::Solr;
 use strict;
 use warnings;
 use base qw(Class::Accessor::Fast);
+use base qw( Class::Accessor::Fast );
+
 use WebService::Solr::Commit;
 use WebService::Solr::Optimize;
 use WebService::Solr::Delete;
@@ -12,14 +14,19 @@ use URI;
 use HTTP::Request;
 use HTTP::Headers;
 
-__PACKAGE__->mk_accessors( 'url' );
+__PACKAGE__->mk_accessors( 'url', 'agent' );
 
 our $VERSION = '0.01';
 
 sub new {
-    my ( $class, $url ) = @_;
-    $url ||= 'http://localhost:8080/solr/';
-    return $class->SUPER::new( { url => URI->new( $url ) } );
+    my ( $class, $url, $options ) = @_;
+    $url ||= 'http://localhost:8983/solr/';
+
+    $options ||= {};
+    $options->{ url } = $url;
+    $options->{ agent } = LWP::UserAgent->new;
+
+    return $class->SUPER::new( $options );
 }
 
 sub add_documents {
@@ -39,8 +46,7 @@ sub add_documents {
         $documentHolder = $documentHolder . $document;
     }
     $xml = $gen->add( { allowDups => $allowDups }, $documentHolder );
-
-    my $ua = LWP::UserAgent->new;
+    my $ua = $self->agent;
     my $h  = HTTP::Headers->new(
         Content_Type => 'text/xml;',
         Content_Base => $url
@@ -62,7 +68,7 @@ sub add_documents {
 sub commit {
     my ( $self, $commitParams ) = @_;
     my $url = $self->url;
-    my $ua  = LWP::UserAgent->new;
+    my $ua  = $self->agent;
     my $h   = HTTP::Headers->new(
         Content_Type => 'text/xml;',
         Content_Base => $url
@@ -83,7 +89,7 @@ sub commit {
 sub optimize {
     my ( $self, $optParams ) = @_;
     my $url = $self->url;
-    my $ua  = LWP::UserAgent->new;
+    my $ua  = $self->agent;
     my $h   = HTTP::Headers->new(
         Content_Type => 'text/xml;',
         Content_Base => $url
@@ -112,7 +118,7 @@ sub delete_documents {
         $xml = $delete->delete_by_query;
     }
     my $url = $self->url;
-    my $ua  = LWP::UserAgent->new;
+    my $ua  = $self->agent;
     my $h   = HTTP::Headers->new(
         Content_Type => 'text/xml;',
         Content_Base => $url

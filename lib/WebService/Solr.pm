@@ -2,8 +2,6 @@ package WebService::Solr;
 use strict;
 use warnings;
 use base qw(Class::Accessor::Fast);
-use base qw( Class::Accessor::Fast );
-
 use WebService::Solr::Commit;
 use WebService::Solr::Optimize;
 use WebService::Solr::Delete;

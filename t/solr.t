@@ -1,4 +1,4 @@
-use Test::More tests => 26;
+use Test::More tests => 25;
 use strict;
 use warnings;
 our $solr = WebService::Solr->new('http://localhost:8080/solr/');

@@ -59,6 +59,7 @@ isa_ok($solr,'WebService::Solr');
     like($got,$expected, 'Delete by query failed');
 
 }
+
 # Test to Add Documents
 # Create Document 1
 # -----------------

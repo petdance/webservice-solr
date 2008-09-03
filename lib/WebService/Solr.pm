@@ -9,19 +9,18 @@ use LWP::UserAgent;
 use URI;
 use HTTP::Request;
 use HTTP::Headers;
-
-__PACKAGE__->mk_accessors( 'url', 'agent' );
+use XML::Simple;
+use Data::Dumper;
+__PACKAGE__->mk_accessors('url', 'agent');
 
 our $VERSION = '0.01';
 
 sub new {
     my ( $class, $url, $options ) = @_;
     $url ||= 'http://localhost:8983/solr/';
-
     $options ||= {};
-    $options->{ url } = $url;
-    $options->{ agent } = LWP::UserAgent->new;
-
+    $options->{ url } = URI->new( $url );
+    $options->{ agent } ||= LWP::UserAgent->new;
     return $class->SUPER::new( $options );
 }
 
@@ -131,21 +130,26 @@ sub delete_documents {
 }
 sub make_query {
     my ( $self, $params ) = @_;
-    my $url            = $self->url."select/?";
-    my $query = join '&', map{
-      "$_=".$params->{$_};
-    }
+    my $url = $self->url->clone;
+        
+    my $path = $url->path."select/";
+    $url->path($path);
+    $url->query_form($params);
+    print "url: $url \n";
     keys %$params;
-    $query = "$url"."$query"."\n";
-    my $ua = LWP::UserAgent->new;
-    $ua->timeout(10);
-    $ua->env_proxy;
-    my $response = $ua->get($query);
+    my $ua  = $self->agent;
+    my $h   = HTTP::Headers->new(
+        Content_Type => 'text/xml;',
+        Content_Base => $url
+    );
+    
+    my $response = $ua->get($url->as_string);
 if ($response->is_success) {
-    return $response->content;  # or whatever
- }
- else {
-     die $response->status_line;
+    my $resp_content = $response->content;  # or whatever
+    my $ref = XMLin($resp_content);
+    print Dumper $ref;
+}else {
+    die $response->status_line;
  }
 }
 1;

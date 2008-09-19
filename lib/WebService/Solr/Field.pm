@@ -15,7 +15,12 @@ sub new {
 
 }
 1;
+sub format_input{
+my $self = shift;
+my $params = $self->{params};
 
+
+}
 sub to_xml {
     my $self   = shift;
     my $params = $self->{ params };

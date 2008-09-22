@@ -11,8 +11,8 @@ use URI;
 use HTTP::Request;
 use HTTP::Headers;
 use XML::Simple qw(:strict);
-use Data::Dumper;
-__PACKAGE__->mk_accessors('url', 'agent');
+
+__PACKAGE__->mk_accessors( 'url', 'agent' );
 
 our $VERSION = '0.01';
 
@@ -129,51 +129,62 @@ sub delete_documents {
         die $response->status_line;
     }
 }
+
 sub make_query {
     my ( $self, $params ) = @_;
     my $url = $self->url->clone;
-        
-    my $path = $url->path."select/";
-    $url->path($path);
-    $url->query_form($params);
+
+    my $path = $url->path . "select/";
+    $url->path( $path );
+    $url->query_form( $params );
     print "url: $url \n";
     keys %$params;
-    my $ua  = $self->agent;
-    my $h   = HTTP::Headers->new(
+    my $ua = $self->agent;
+    my $h  = HTTP::Headers->new(
         Content_Type => 'text/xml;',
         Content_Base => $url
     );
-    
-    my $response = $ua->get($url->as_string);
-if ($response->is_success) {
-    my $resp_content = $response->content;  # or whatever
-    my $resp = XMLin($resp_content,ForceArray=>1,KeyAttr=>{'id','inStock','includes','manu','name','popularity','price','sku','timestamp','weight','cat','features'});
-    my $result = $resp->{'result'};
-# docs is an array 
-my $docs = $result->[0]->{'doc'};
-my $i = 0; 
-my $j = 0;
-my $k = 0;
-my (@doc_holder,@arr_hash,$sub_array);
-my ($h,$v);
-# doc is a hash
-my %fields;
-for my $doc(@$docs){
-    for my $vals (values %$doc){
-        for my $field (@$vals){
-            my $name = delete $field->{name};
-            my ($vals) = values %$field;
-            my @vals = ref $vals ? @$vals : ($vals);
-            #$fields{$name}={$vals};        
-        }
-    
-    }
 
-}    
-    
-    #print Dumper $resp;
-    return $resp;
-    }else {
-    die $response->status_line;
+    my $response = $ua->get( $url->as_string );
+    if ( $response->is_success ) {
+        my $resp_content = $response->content;    # or whatever
+        my $resp         = XMLin(
+            $resp_content,
+            ForceArray => 1,
+            KeyAttr    => {
+                'id',        'inStock',    'includes', 'manu',
+                'name',      'popularity', 'price',    'sku',
+                'timestamp', 'weight',     'cat',      'features'
+            }
+        );
+        my $result = $resp->{ 'result' };
+
+        # docs is an array
+        my $docs = $result->[ 0 ]->{ 'doc' };
+        my ( @doc_holder, @arr_hash, $sub_array );
+        my ( $h, $v );
+
+        # doc is a hash
+        my %fields;
+        for my $doc ( @$docs ) {
+            for my $vals ( values %$doc ) {
+                for my $field ( @$vals ) {
+                    my $name     = delete $field->{ name };
+                    my ( $vals ) = values %$field;
+                    my @vals     = ref $vals ? @$vals : ( $vals );
+
+                    #$fields{$name}={$vals};
+                }
+
+            }
+
+        }
+
+        return $resp;
+    }
+    else {
+        die $response->status_line;
     }
 }
+
+1;

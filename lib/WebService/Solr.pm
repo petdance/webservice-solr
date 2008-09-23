@@ -11,7 +11,7 @@ use URI;
 use HTTP::Request;
 use HTTP::Headers;
 use XML::Simple qw(:strict);
-
+use Data::Dumper;
 __PACKAGE__->mk_accessors( 'url', 'agent' );
 
 our $VERSION = '0.01';
@@ -133,7 +133,6 @@ sub delete_documents {
 sub make_query {
     my ( $self, $params ) = @_;
     my $url = $self->url->clone;
-
     my $path = $url->path . "select/";
     $url->path( $path );
     $url->query_form( $params );
@@ -145,7 +144,9 @@ sub make_query {
         Content_Base => $url
     );
 
+    my @final_documents;
     my $response = $ua->get( $url->as_string );
+
     if ( $response->is_success ) {
         my $resp_content = $response->content;    # or whatever
         my $resp         = XMLin(
@@ -161,26 +162,26 @@ sub make_query {
 
         # docs is an array
         my $docs = $result->[ 0 ]->{ 'doc' };
-        my ( @doc_holder, @arr_hash, $sub_array );
-        my ( $h, $v );
 
         # doc is a hash
-        my %fields;
+
         for my $doc ( @$docs ) {
+            my %doc_out;
+            my @documents;
             for my $vals ( values %$doc ) {
+
+                #==== @vals separate the fields in groups of type =======";
+                # An array of str, int, bool, float, arr, date and
                 for my $field ( @$vals ) {
                     my $name     = delete $field->{ name };
                     my ( $vals ) = values %$field;
                     my @vals     = ref $vals ? @$vals : ( $vals );
-
-                    #$fields{$name}={$vals};
+                    $doc_out{ $name } = $vals;
                 }
-
             }
-
+            push( @final_documents, \%doc_out );
         }
-
-        return $resp;
+        return @final_documents;
     }
     else {
         die $response->status_line;

@@ -192,21 +192,3 @@ sub make_query {
     }
 }
 1;
-package main;
-use strict;
-use warnings;
-use Data::Dumper;
-use Solr::Field;
-use Solr;
-
-#my $query_opts ={'q'=>'ipod',rows=>'0','facet'=>'true','facet.limit'=>'-1','facet.field' =>'cat', 'facet.field'=>'inStock'};
-my $query_opts = {
-    'q'           => '*:*',
-    'rows'          => '27',
-    'facet'       => 'true',
-    'facet.limit' => '-1',
-    'facet.field' => [ 'cat', 'inStock' ]
-};
-my $url      = 'http://localhost:8080/solr/';
-my $solr     = WebService::Solr->new( $url );
-my $response = $solr->make_query( $query_opts );

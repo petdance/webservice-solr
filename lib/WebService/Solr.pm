@@ -152,17 +152,21 @@ sub make_query {
         my $resp         = XMLin(
             $resp_content,
             ForceArray => 1,
+        # KeyAttr should match the schema.xml list of allowed fields.
             KeyAttr    => {
                 'id',        'inStock',    'includes', 'manu',
                 'name',      'popularity', 'price',    'sku',
-                'timestamp', 'weight',     'cat',      'features'
+                'timestamp', 'weight',     'cat',      'features',
+                'nameSort',  'alphaNameSort', 'includes' , 'word',
+                'text',      'manu_exact',    
             }
         );
+        my $response= $resp->{'response'};
         my $result = $resp->{ 'result' };
-
+        print Dumper $result;
         # docs is an array
         my $docs = $result->[ 0 ]->{ 'doc' };
-
+        
         # doc is a hash
 
         for my $doc ( @$docs ) {
@@ -187,5 +191,22 @@ sub make_query {
         die $response->status_line;
     }
 }
-
 1;
+package main;
+use strict;
+use warnings;
+use Data::Dumper;
+use Solr::Field;
+use Solr;
+
+#my $query_opts ={'q'=>'ipod',rows=>'0','facet'=>'true','facet.limit'=>'-1','facet.field' =>'cat', 'facet.field'=>'inStock'};
+my $query_opts = {
+    'q'           => '*:*',
+    'rows'          => '27',
+    'facet'       => 'true',
+    'facet.limit' => '-1',
+    'facet.field' => [ 'cat', 'inStock' ]
+};
+my $url      = 'http://localhost:8080/solr/';
+my $solr     = WebService::Solr->new( $url );
+my $response = $solr->make_query( $query_opts );

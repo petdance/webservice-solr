@@ -185,7 +185,7 @@ sub make_query {
             }
             push( @final_documents, \%doc_out );
         }
-        return @final_documents;
+       return @final_documents;
     }
     else {
         die $response->status_line;

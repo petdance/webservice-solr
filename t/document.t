@@ -48,18 +48,18 @@ my $f9 = WebService::Solr::Field->new(\%fields9);
 {
     my @fields1 =($f1,$f2,$f3,$f4,$f5);
     my %params1 =(boost=>'3.0');
-    my $document1 = WebService::Solr::Document->new(\%params1);
-    my $got = $document1->to_xml(\@fields1);
+    my $document1 = WebService::Solr::Document->new();
+    my $got = $document1->to_xml(\@fields1,\%params1);
     like( $got, qr{<doc boost="3.0">\s*<field boost="1.6" name="id">1</field>\s*<field boost="1.0" name="sku">A6B9A</field>\s*<field boost="7.1" name="manu">The Bird Book</field>\s*<field boost="3.2" name="weight">4.0</field>\s*<field boost="1.0" name="name">Sally Jesse Raphael</field>\s*</doc>}s, 'xml add fields to document' );
 }
 # Test 4
 {
     my @fields1 =($f1,$f2,$f3,$f4,$f6);
     my %params1 =(boost=>'3.0');
-    my $document1 = WebService::Solr::Document->new(\%params1);
+    my $document1 = WebService::Solr::Document->new();
     my $got='';  
     eval{
-        $got=$document1->to_xml(\@fields1);
+        $got=$document1->to_xml(\@fields1,\%params1);
     };
     ok($@,'The name attribute is missing a value! '); 
 }
@@ -68,10 +68,10 @@ my $f9 = WebService::Solr::Field->new(\%fields9);
 {
 my @fields1 =($f1,$f2,$f3,$f4,$f7);
     my %params1 =(boost=>'3.0');
-    my $document1 = WebService::Solr::Document->new(\%params1);
+    my $document1 = WebService::Solr::Document->new();
     my $got='';  
     eval{
-        $got=$document1->to_xml(\@fields1);
+        $got=$document1->to_xml(\@fields1,\%params1);
     };
     ok($@,'The value attribute is missing a value! '); 
 }
@@ -79,10 +79,10 @@ my @fields1 =($f1,$f2,$f3,$f4,$f7);
 {
 my @fields1 =($f1,$f2,$f3,$f4,$f8);
     my %params1 =(boost=>'3.0');
-    my $document1 = WebService::Solr::Document->new(\%params1);
+    my $document1 = WebService::Solr::Document->new();
     my $got='';  
     eval{
-        $got=$document1->to_xml(\@fields1);
+        $got=$document1->to_xml(\@fields1,\%params1);
     };
     ok($@,'The name and value attribute are missing values! '); 
 }

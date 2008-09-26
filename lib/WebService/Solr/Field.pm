@@ -9,18 +9,14 @@ sub new {
     my ( $class, $params ) = @_;
 
     # Accepts a hash of fields.
-    my $self = { params => $params };
+    my $self = { 
+        params => $params,
+     };
     bless $self, $class;
     return $self;
 
 }
 1;
-sub format_input{
-my $self = shift;
-my $params = $self->{params};
-
-
-}
 sub to_xml {
     my $self   = shift;
     my $params = $self->{ params };

@@ -10,7 +10,7 @@ all_from 'lib/WebService/Solr.pm';
 requires 'LWP::UserAgent';
 requires 'URI';
 requires 'XML::Generator';
-requires 'Class::Accessor::Fast';
+requires 'Moose';
 
 test_requires 'Test::More';
 test_requires 'XML::Simple';

@@ -1,52 +1,32 @@
 package WebService::Solr::Field;
 
-use strict;
-use warnings;
+use Moose;
 
-use XML::Generator;
+has 'name' => ( is => 'rw', isa => 'Str' );
 
-sub new {
-    my ( $class, $params ) = @_;
+has 'value' => ( is => 'rw', isa => 'Str' );
 
-    # Accepts a hash of fields.
-    my $self = { 
-        params => $params,
-     };
-    bless $self, $class;
-    return $self;
+has 'boost' => ( is => 'rw', isa => 'Maybe[Num]' );
 
+require XML::Generator;
+
+sub BUILDARGS {
+    my ( $self, $name, $value, $opts ) = @_;
+    $opts ||= {};
+
+    return { name => $name, value => $value, %$opts };
 }
-1;
+
 sub to_xml {
-    my $self   = shift;
-    my $params = $self->{ params };
-    my $name   = '';
-    my $value  = '';
-    my $boost  = '';
+    my $self = shift;
+    my $gen  = XML::Generator->new( ':std' );
+    my %attr = ( $self->boost ? ( boost => $self->boost ) : () );
 
-    # If boost has no value then set to default 1.0
-    # Look for values of 'name' and 'value' attributes.
-    if ( $params->{ 'boost' } ) {
-        $boost = $params->{ 'boost' };
-    }
-    else {
-        $boost = '1.0';
-    }
-    if ( $params->{ 'value' }
-        || die "The field attribute 'value' is missing a value! " )
-    {
-        $value = $params->{ 'value' };
-    }
-    if ( $params->{ 'name' }
-        || die "The field attribute 'name' is missing a value! " )
-    {
-        $name = $params->{ name };
-    }
-
-    my $gen = XML::Generator->new();
-
-    my $str = $gen->field( { name => $name, boost => $boost }, $value );
-    return "$str";
-
+    return $gen->field( { name => $self->name, %attr }, $self->value );
 }
+
+no Moose;
+
+__PACKAGE__->meta->make_immutable;
+
 1;

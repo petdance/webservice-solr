@@ -1,46 +1,36 @@
-use Test::More tests=>5;
+use Test::More tests => 8;
+
 use strict;
 use warnings;
 
-# Test 1
-
 BEGIN { use_ok( 'WebService::Solr::Field' ); }
 
-# Test 2
 {
-    my %p =(name=>"id",boost=>"3.0",value=>"0001");
-    my $f = WebService::Solr::Field->new(\%p);
-    my $got=$f->to_xml; 
-    my $expected ='<field boost="3.0" name="id">0001</field>';
-    ok($got eq $expected, 'Test all attributes');
+    my $f = WebService::Solr::Field->new( id => '0001' );
+    my $expected = '<field name="id">0001</field>';
+    is( $f->to_xml, $expected, 'to_xml(), default attrs' );
 }
-# Test 3
+
 {
-    my %p =(name=>"id",boost=>"",value=>"0001");
-    my $f = WebService::Solr::Field->new(\%p);
-    my $got=$f->to_xml; 
-    my $expected ='<field boost="1.0" name="id">0001</field>';
-    ok($got eq $expected, 'Test no boost');
+    my $f = WebService::Solr::Field->new( id => '0001', { boost => 3 } );
+    my $expected = '<field boost="3" name="id">0001</field>';
+    is( $f->to_xml, $expected, 'to_xml(), all attrs' );
 }
-# Test 4
+
 {
-    my %p =(name=>"",boost=>"3.0",value=>"0001");
-    my $f = WebService::Solr::Field->new(\%p);
-    my $got;
-    eval{
-         $got=$f->to_xml;
-    };
-    ok($@,'Test missing field name.');
-    
+    my $f = WebService::Solr::Field->new( id => '0001', { boost => 3.1 } );
+    my $expected = '<field boost="3.1" name="id">0001</field>';
+    is( $f->to_xml, $expected, 'to_xml(), all attrs, float for boost' );
 }
-# Test 5
+
 {
-    my %p =(name=>"id",boost=>"3.0",value=>"");
-    my $f = WebService::Solr::Field->new(\%p);
-    my $got;
-    eval{
-         $got=$f->to_xml;
-    };
-    ok($@,'Test missing field value.');
-    
+    my $f = eval { WebService::Solr::Field->new( undef() => '0001' ) };
+    ok( !defined $f, 'name required' );
+    ok( $@,          'name required' );
+}
+
+{
+    my $f = eval { WebService::Solr::Field->new( id => undef ) };
+    ok( !defined $f, 'value required' );
+    ok( $@,          'value required' );
 }

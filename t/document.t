@@ -1,88 +1,110 @@
-use Test::More tests=>6;
+use Test::More tests => 12;
+
 use strict;
 use warnings;
 
-# Test 1
-
-BEGIN { use_ok( 'WebService::Solr::Document' ); }
-
-# Test 2 
-
-BEGIN { use_ok( 'WebService::Solr::Field' ); }
-
-# Test Data all attributes with values. 
-
-my %fields1 = (name=>'id',value=>'1',boost=>'1.6');
-my %fields2 = (name=>'sku',value=>'A6B9A',boost=>'1.0');
-my %fields3 = (name=>'manu',value=>'The Bird Book',boost=>'7.1');
-my %fields4 = (name=>'weight',value=>'4.0',boost=>'3.2');
-my %fields5 = (name=>'name',value=>'Sally Jesse Raphael',boost=>'');
-
-# No name present 
-
-my %fields6 = (name=>'',value=>'Sally Jesse Raphael',boost=>'7.1');
-
-# No value present
-
-my %fields7 = (name=>'name',value=>'',boost=>'7.1');
-
-# No name and value present
-
-my %fields8 = (name=>'',value=>'',boost=>'7.1');
-
-# No attribute values present.
-
-my %fields9 = (name=>'',value=>'',boost=>'');
-
-my $f1 = WebService::Solr::Field->new(\%fields1);
-my $f2 = WebService::Solr::Field->new(\%fields2);
-my $f3 = WebService::Solr::Field->new(\%fields3);
-my $f4 = WebService::Solr::Field->new(\%fields4);
-my $f5 = WebService::Solr::Field->new(\%fields5);
-my $f6 = WebService::Solr::Field->new(\%fields6);
-my $f7 = WebService::Solr::Field->new(\%fields7);
-my $f8 = WebService::Solr::Field->new(\%fields8);
-my $f9 = WebService::Solr::Field->new(\%fields9);
-
-# Test 3
-{
-    my @fields1 =($f1,$f2,$f3,$f4,$f5);
-    my %params1 =(boost=>'3.0');
-    my $document1 = WebService::Solr::Document->new();
-    my $got = $document1->to_xml(\@fields1,\%params1);
-    like( $got, qr{<doc boost="3.0">\s*<field boost="1.6" name="id">1</field>\s*<field boost="1.0" name="sku">A6B9A</field>\s*<field boost="7.1" name="manu">The Bird Book</field>\s*<field boost="3.2" name="weight">4.0</field>\s*<field boost="1.0" name="name">Sally Jesse Raphael</field>\s*</doc>}s, 'xml add fields to document' );
-}
-# Test 4
-{
-    my @fields1 =($f1,$f2,$f3,$f4,$f6);
-    my %params1 =(boost=>'3.0');
-    my $document1 = WebService::Solr::Document->new();
-    my $got='';  
-    eval{
-        $got=$document1->to_xml(\@fields1,\%params1);
-    };
-    ok($@,'The name attribute is missing a value! '); 
+BEGIN {
+    use_ok( 'WebService::Solr::Document' );
+    use_ok( 'WebService::Solr::Field' );
 }
 
-# Test 5 
+my @fields = (
+    [ id     => 1,               { boost => 1.6 } ],
+    [ sku    => 'A6B9A',         { boost => '1.0' } ],
+    [ manu   => 'The Bird Book', { boost => '7.1' } ],
+    [ weight => '4.0',           { boost => 3.2 } ],
+    [ name   => 'Sally Jesse Raphael' ],
+);
+
+my @field_objs = map { WebService::Solr::Field->new( @$_ ) } @fields;
+
 {
-my @fields1 =($f1,$f2,$f3,$f4,$f7);
-    my %params1 =(boost=>'3.0');
-    my $document1 = WebService::Solr::Document->new();
-    my $got='';  
-    eval{
-        $got=$document1->to_xml(\@fields1,\%params1);
-    };
-    ok($@,'The value attribute is missing a value! '); 
+    my $expect = join( '',
+        '<doc boost="3.0">',
+        '<field boost="1.6" name="id">1</field>',
+        '<field boost="1.0" name="sku">A6B9A</field>',
+        '<field boost="7.1" name="manu">The Bird Book</field>',
+        '<field boost="3.2" name="weight">4.0</field>',
+        '<field name="name">Sally Jesse Raphael</field>',
+        '</doc>' );
+
+    {
+        my $doc = WebService::Solr::Document->new( @fields[ 0 .. 4 ] );
+        $doc->boost( '3.0' );
+        is( $doc->to_xml, $expect, 'to_xml(), array refs' );
+    }
+
+    {
+        my $doc = WebService::Solr::Document->new( @field_objs[ 0 .. 4 ] );
+        $doc->boost( '3.0' );
+        is( $doc->to_xml, $expect, 'to_xml(), objs' );
+    }
+
+    {
+        my $doc = WebService::Solr::Document->new();
+        $doc->boost( '3.0' );
+        $doc->add_fields( @field_objs[ 0 .. 4 ] );
+        is( $doc->to_xml, $expect, 'to_xml(), add_fields()' );
+    }
+
+    {
+        my $doc = WebService::Solr::Document->new(
+            $field_objs[ 0 ],
+            @fields[ 1 .. 3 ],
+            $field_objs[ 4 ]
+        );
+        $doc->boost( '3.0' );
+        is( $doc->to_xml, $expect, 'to_xml(), mixed' );
+    }
 }
-# Test 6
+
 {
-my @fields1 =($f1,$f2,$f3,$f4,$f8);
-    my %params1 =(boost=>'3.0');
-    my $document1 = WebService::Solr::Document->new();
-    my $got='';  
-    eval{
-        $got=$document1->to_xml(\@fields1,\%params1);
-    };
-    ok($@,'The name and value attribute are missing values! '); 
+    my $doc = WebService::Solr::Document->new( key => 'value' );
+    is( $doc->to_xml,
+        '<doc><field name="key">value</field></doc>',
+        'to_xml(), key=>val'
+    );
+}
+
+{
+    my $doc
+        = WebService::Solr::Document->new( key => 'value', $field_objs[ 0 ] );
+    is( $doc->to_xml,
+        '<doc><field name="key">value</field><field boost="1.6" name="id">1</field></doc>',
+        'to_xml(), key=>val + obj'
+    );
+}
+
+{
+    my $doc
+        = WebService::Solr::Document->new( $field_objs[ 0 ], key => 'value' );
+    is( $doc->to_xml,
+        '<doc><field boost="1.6" name="id">1</field><field name="key">value</field></doc>',
+        'to_xml(), obj + key=>val'
+    );
+}
+
+{
+    my $doc = WebService::Solr::Document->new( @field_objs[ 0 .. 4 ],
+        $field_objs[ 1 ] );
+
+    {
+        my @values = $doc->values_for( 'id' );
+        is_deeply( \@values, [ 1 ], 'values_for() -- single value' );
+    }
+
+    {
+        my @values = $doc->values_for( 'sku' );
+        is_deeply(
+            \@values,
+            [ 'A6B9A', 'A6B9A' ],
+            'values_for() -- multi-value'
+        );
+    }
+
+    {
+        my @values = $doc->values_for( 'dne' );
+        is_deeply( \@values, [], 'values_for() -- no values' );
+    }
+
 }

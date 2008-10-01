@@ -1,29 +1,76 @@
 package WebService::Solr;
-use strict;
-use warnings;
-use base qw(Class::Accessor::Fast);
-use WebService::Solr::Commit;
-use WebService::Solr::Optimize;
-use WebService::Solr::Delete;
-use WebService::Solr::Field;
-use LWP::UserAgent;
+
+use Moose;
+
 use URI;
+use LWP::UserAgent;
+use WebService::Solr::Request::AddDocument;
+use WebService::Solr::Request::Commit;
+use WebService::Solr::Response;
 use HTTP::Request;
-use HTTP::Headers;
-use XML::Simple qw(:strict);
-use Data::Dumper;
-__PACKAGE__->mk_accessors( 'url', 'agent' );
+
+has 'url' => (
+    is      => 'ro',
+    isa     => 'URI',
+    default => sub { URI->new( 'http://localhost:8983/solr/' ) }
+);
+
+has 'agent' =>
+    ( is => 'ro', isa => 'Object', default => sub { LWP::UserAgent->new } );
+
+has 'autocommit' => ( is => 'ro', isa => 'Bool', default => 1 );
+
+#use WebService::Solr::Optimize;
+#use WebService::Solr::Delete;
+#use WebService::Solr::Field;
+#use HTTP::Headers;
+#use XML::Simple qw(:strict);
 
 our $VERSION = '0.01';
 
-sub new {
-    my ( $class, $url, $options ) = @_;
-    $url ||= 'http://localhost:8983/solr/';
+sub BUILDARGS {
+    my ( $self, $url, $options ) = @_;
     $options ||= {};
-    $options->{ url } = URI->new( $url );
-    $options->{ agent } ||= LWP::UserAgent->new;
-    return $class->SUPER::new( $options );
+
+    if ( $url ) {
+        $options->{ url } = ref $url ? $url : URI->new( $url );
+    }
+
+    return $options;
 }
+
+sub add {
+    my ( $self, $doc ) = @_;
+    my @docs = ref $doc eq 'ARRAY' ? @$doc : ( $doc );
+    my $response
+        = $self->send( WebService::Solr::Request::AddDocument->new( @docs ) );
+    $self->commit if $self->autocommit;
+    return $response->success;
+}
+
+*update = \&add;
+
+sub commit {
+    my ( $self, %options ) = @_;
+    my $response
+        = $self->send( WebService::Solr::Request::Commit->new( %options ) );
+    return $response->success;
+}
+
+sub send {
+    my ( $self, $request ) = @_;
+    my $http_req = HTTP::Request->new(
+        POST => $self->url . '/' . $request->handler,
+        [ Content_Type => $request->content_type ], $request->to_xml
+    );
+    my $response = $self->agent->post( $http_req );
+
+    return WebService::Solr::Response->new( $response );
+}
+
+1;
+
+__END__
 
 sub add_documents {
     my ( $self, $arrDocuments, $opts ) = @_;
@@ -163,7 +210,7 @@ sub make_query {
         );
         my $response= $resp->{'response'};
         my $result = $resp->{ 'result' };
-        print Dumper $result;
+        use Data::Dumper; print Dumper $result;
         # docs is an array
         my $docs = $result->[ 0 ]->{ 'doc' };
         

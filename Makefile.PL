@@ -13,7 +13,8 @@ requires 'XML::Generator';
 requires 'Moose';
 
 test_requires 'Test::More';
-test_requires 'XML::Simple';
+
+tests_recursive;
 
 auto_install;
 WriteAll;

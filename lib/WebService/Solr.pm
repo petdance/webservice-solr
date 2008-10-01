@@ -6,6 +6,7 @@ use URI;
 use LWP::UserAgent;
 use WebService::Solr::Request::AddDocument;
 use WebService::Solr::Request::Commit;
+use WebService::Solr::Request::Delete;
 use WebService::Solr::Request::Optimize;
 use WebService::Solr::Response;
 use HTTP::Request;
@@ -20,12 +21,6 @@ has 'agent' =>
     ( is => 'ro', isa => 'Object', default => sub { LWP::UserAgent->new } );
 
 has 'autocommit' => ( is => 'ro', isa => 'Bool', default => 1 );
-
-#use WebService::Solr::Optimize;
-#use WebService::Solr::Delete;
-#use WebService::Solr::Field;
-#use HTTP::Headers;
-#use XML::Simple qw(:strict);
 
 our $VERSION = '0.01';
 
@@ -63,6 +58,19 @@ sub commit {
 sub optimize {
     my ( $self ) = @_;
     my $response = $self->send( WebService::Solr::Request::Optimize->new );
+    return $response->success;
+}
+
+sub delete {
+    my ( $self, $id ) = @_;
+    my $response = $self->send( WebService::Solr::Request::Delete->new( id => $id ) );
+    $self->commit if $self->autocommit;
+    return $response->success;
+}
+sub delete_by_query {
+    my ( $self, $query ) = @_;
+    my $response = $self->send( WebService::Solr::Request::Delete->new( query => $query ) );
+    $self->commit if $self->autocommit;
     return $response->success;
 }
 
@@ -118,75 +126,6 @@ sub add_documents {
         die $response->status_line;
     }
 
-}
-
-sub commit {
-    my ( $self, $commitParams ) = @_;
-    my $url = $self->url;
-    my $ua  = $self->agent;
-    my $h   = HTTP::Headers->new(
-        Content_Type => 'text/xml;',
-        Content_Base => $url
-    );
-    my $commit   = WebService::Solr::Commit->new( $commitParams );
-    my $xml      = $commit->to_xml;
-    my $request  = HTTP::Request->new( 'POST', "$url" . "update/", $h, $xml );
-    my $response = $ua->request( $request );
-
-    if ( $response->is_success ) {
-        return $response->content;
-    }
-    else {
-        die $response->status_line;
-    }
-}
-
-sub optimize {
-    my ( $self, $optParams ) = @_;
-    my $url = $self->url;
-    my $ua  = $self->agent;
-    my $h   = HTTP::Headers->new(
-        Content_Type => 'text/xml;',
-        Content_Base => $url
-    );
-    my $optimize = WebService::Solr::Optimize->new( $optParams );
-    my $xml      = $optimize->to_xml;
-    my $request  = HTTP::Request->new( 'POST', "$url" . "update/", $h, $xml );
-    my $response = $ua->request( $request );
-
-    if ( $response->is_success ) {
-        return $response->content;
-    }
-    else {
-        die $response->status_line;
-    }
-}
-
-sub delete_documents {
-    my ( $self, $delParams ) = @_;
-    my $delete = WebService::Solr::Delete->new( $delParams );
-    my $xml;
-    if ( $delParams->{ 'id' } ) {
-        $xml = $delete->delete_by_id;
-    }
-    if ( $delParams->{ 'query' } ) {
-        $xml = $delete->delete_by_query;
-    }
-    my $url = $self->url;
-    my $ua  = $self->agent;
-    my $h   = HTTP::Headers->new(
-        Content_Type => 'text/xml;',
-        Content_Base => $url
-    );
-    my $request = HTTP::Request->new( 'POST', "$url" . "update/", $h, $xml );
-    my $response = $ua->request( $request );
-
-    if ( $response->is_success ) {
-        return $response->content;
-    }
-    else {
-        die $response->status_line;
-    }
 }
 
 sub make_query {

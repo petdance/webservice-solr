@@ -8,6 +8,7 @@ use WebService::Solr::Request::AddDocument;
 use WebService::Solr::Request::Commit;
 use WebService::Solr::Request::Delete;
 use WebService::Solr::Request::Optimize;
+use WebService::Solr::Request::Ping;
 use WebService::Solr::Response;
 use HTTP::Request;
 
@@ -63,22 +64,32 @@ sub optimize {
 
 sub delete {
     my ( $self, $id ) = @_;
-    my $response = $self->send( WebService::Solr::Request::Delete->new( id => $id ) );
+    my $response
+        = $self->send( WebService::Solr::Request::Delete->new( id => $id ) );
     $self->commit if $self->autocommit;
     return $response->success;
 }
+
 sub delete_by_query {
     my ( $self, $query ) = @_;
-    my $response = $self->send( WebService::Solr::Request::Delete->new( query => $query ) );
+    my $response = $self->send(
+        WebService::Solr::Request::Delete->new( query => $query ) );
     $self->commit if $self->autocommit;
+    return $response->success;
+}
+
+sub ping {
+    my ( $self ) = @_;
+    my $response = $self->send( WebService::Solr::Request::Ping->new );
     return $response->success;
 }
 
 sub send {
     my ( $self, $request ) = @_;
+    my $xml = $request->can( 'to_xml' ) ? $request->to_xml : '';
     my $http_req = HTTP::Request->new(
         POST => $self->url . '/' . $request->handler,
-        [ Content_Type => $request->content_type ], $request->to_xml . ''
+        [ Content_Type => $request->content_type ], "$xml"
     );
 
     #use Data::Dumper; die Dumper $http_req;

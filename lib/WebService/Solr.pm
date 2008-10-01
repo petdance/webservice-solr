@@ -53,13 +53,13 @@ sub commit {
     my ( $self, %options ) = @_;
     my $response
         = $self->send( WebService::Solr::Request::Commit->new( %options ) );
-    return $response->success;
+    return $response->ok;
 }
 
 sub optimize {
     my ( $self ) = @_;
     my $response = $self->send( WebService::Solr::Request::Optimize->new );
-    return $response->success;
+    return $response->ok;
 }
 
 sub delete {
@@ -81,7 +81,7 @@ sub delete_by_query {
 sub ping {
     my ( $self ) = @_;
     my $response = $self->send( WebService::Solr::Request::Ping->new );
-    return $response->success;
+    return $response->ok;
 }
 
 sub send {
@@ -96,7 +96,7 @@ sub send {
     my $http_res = $self->agent->request( $http_req );
 
     #use Data::Dumper; die Dumper $http_res;
-    return WebService::Solr::Response->new( $request, $http_res );
+    return WebService::Solr::Response->make_response( $request, $http_res );
 }
 
 1;
@@ -200,4 +200,3 @@ sub make_query {
         die $response->status_line;
     }
 }
-1;

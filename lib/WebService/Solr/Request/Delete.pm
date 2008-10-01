@@ -11,12 +11,12 @@ has 'id' => ( is => 'ro', isa => 'Maybe[Num]' );
 has 'query' => ( is => 'ro', isa => 'Maybe[Str]' );
 
 sub BUILDARGS {
-    my( $self, %args ) = @_;
+    my ( $self, %args ) = @_;
 
-    if( !defined $args{ id } and !defined $args{ query } ) {
+    if ( !defined $args{ id } and !defined $args{ query } ) {
         die 'Either a query or an id must be specified';
     }
-    elsif( defined $args{ id } and defined $args{ query } ) {
+    elsif ( defined $args{ id } and defined $args{ query } ) {
         die 'Both a query and an id cannot be specified simultaneously';
     }
 

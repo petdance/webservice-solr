@@ -42,7 +42,7 @@ sub add {
     my $response
         = $self->send( WebService::Solr::Request::AddDocument->new( @docs ) );
     $self->commit if $self->autocommit;
-    return $response->success;
+    return $response->ok;
 }
 
 sub update {
@@ -102,42 +102,6 @@ sub send {
 1;
 
 __END__
-
-sub add_documents {
-    my ( $self, $arrDocuments, $opts ) = @_;
-
-    # Default value of allowDups
-    my $allowDups      = 'false';
-    my $xml            = '';
-    my $document       = '';
-    my $url            = $self->url;
-    my $documentHolder = '';
-    my $gen            = XML::Generator->new();
-    if ( $opts->{ 'allowDups' } ) {
-        $allowDups = $opts->{ 'allowDups' };
-    }
-    foreach $document ( @$arrDocuments ) {
-        $documentHolder = $documentHolder . $document;
-    }
-    $xml = $gen->add( { allowDups => $allowDups }, $documentHolder );
-    my $ua = $self->agent;
-    my $h  = HTTP::Headers->new(
-        Content_Type => 'text/xml;',
-        Content_Base => $url
-    );
-
-    my $request
-        = HTTP::Request->new( 'POST', "$url" . "update/", $h, "$xml" );
-    my $response = $ua->request( $request );
-
-    if ( $response->is_success ) {
-        return $response->content;
-    }
-    else {
-        die $response->status_line;
-    }
-
-}
 
 sub make_query {
     my ( $self, $params ) = @_;

@@ -4,6 +4,8 @@ if( -e 'MANIFEST.SKIP' ) {
     system( 'pod2text lib/WebService/Solr.pm > README' );
 }
 
+perl_version '5.008';
+
 name 'WebService-Solr';
 all_from 'lib/WebService/Solr.pm';
 

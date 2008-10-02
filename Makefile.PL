@@ -10,9 +10,12 @@ all_from 'lib/WebService/Solr.pm';
 requires 'LWP::UserAgent';
 requires 'URI';
 requires 'XML::Generator';
+requires 'JSON::XS';
 requires 'Moose';
 
 test_requires 'Test::More';
+test_requires 'XML::Simple';
+test_requires 'Test::Mock::LWP';
 
 tests_recursive;
 

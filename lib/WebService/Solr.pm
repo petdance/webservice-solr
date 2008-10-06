@@ -67,7 +67,7 @@ sub delete {
     my $response
         = $self->send( WebService::Solr::Request::Delete->new( id => $id ) );
     $self->commit if $self->autocommit;
-    return $response->success;
+    return $response->ok;
 }
 
 sub delete_by_query {
@@ -75,7 +75,7 @@ sub delete_by_query {
     my $response = $self->send(
         WebService::Solr::Request::Delete->new( query => $query ) );
     $self->commit if $self->autocommit;
-    return $response->success;
+    return $response->ok;
 }
 
 sub ping {

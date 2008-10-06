@@ -32,7 +32,11 @@ for (
 
 sub _test_req {
     is( $_[ 2 ]->path, '/solr/update', 'optimize() path' );
-    is_deeply( { $_[ 2 ]->query_form }, { wt => 'json' }, 'optimize() params' );
+    is_deeply(
+        { $_[ 2 ]->query_form },
+        { wt => 'json' },
+        'optimize() params'
+    );
     is_deeply(
         $_[ 3 ],
         [ 'Content_Type', 'text/xml; charset=utf-8' ],

@@ -12,7 +12,7 @@ use HTTP::Request;
 has 'url' => (
     is      => 'ro',
     isa     => 'URI',
-    default => sub { URI->new( 'http://localhost:8983/solr/' ) }
+    default => sub { URI->new( 'http://localhost:8983/solr' ) }
 );
 
 has 'agent' =>
@@ -48,7 +48,9 @@ sub add {
     return $response->success;
 }
 
-*update = \&add;
+sub update {
+    return shift->add( @_ );
+}
 
 sub commit {
     my ( $self, %options ) = @_;
@@ -61,11 +63,11 @@ sub send {
     my ( $self, $request ) = @_;
     my $http_req = HTTP::Request->new(
         POST => $self->url . '/' . $request->handler,
-        [ Content_Type => $request->content_type ], $request->to_xml
+        [ Content_Type => $request->content_type ], $request->to_xml . ''
     );
-    my $response = $self->agent->post( $http_req );
+    my $http_res = $self->agent->post( $http_req );
 
-    return WebService::Solr::Response->new( $response );
+    return WebService::Solr::Response->new( $request, $http_res );
 }
 
 1;

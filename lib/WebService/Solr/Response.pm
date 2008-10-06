@@ -1,36 +1,68 @@
 package WebService::Solr::Response;
 
 use Moose;
+use WebService::Solr::Document;
 
-require Class::MOP;
-use XML::XPath;
+use JSON::XS ();
 
-has 'raw_response' => ( is => 'ro', isa => 'Object' );
+has 'raw_response' => (
+    is      => 'ro',
+    isa     => 'Object',
+    handles => [ qw( status_code status_message is_success is_error ) ]
+);
 
-has 'status_code' => ( is => 'rw', isa => 'Int' );
+has 'content' => ( is => 'rw', isa => 'HashRef', lazy_build => 1 );
 
-has 'status_message' => ( is => 'rw', isa => 'Int' );
+has 'docs' =>
+    ( is => 'rw', isa => 'ArrayRef', auto_deref => 1, lazy_build => 1 );
 
-sub make_response {
-    my ( $self, $req, $http_res ) = @_;
-    ( my $class = ref $req ) =~ s{Request}{Response};
-    Class::MOP::load_class( $class );
-    return $class->new( raw_response => $http_res );
+has 'pager' => ( is => 'rw', isa => 'Data::Page', lazy_build => 1 );
+
+sub BUILDARGS {
+    my ( $self, $res ) = @_;
+    return { raw_response => $res };
 }
 
-sub BUILD {
-    my ( $self, $args ) = @_;
-    my $res = $args->{ raw_response };
+sub _build_content {
+    my $self = shift;
+    my $content = $self->raw_response->content;
+    return {} unless $content;
+    return JSON::XS::decode_json( $content );
+}
 
-    my $xpath = XML::XPath->new( xml => $res->content );
-    my $status = $xpath->findvalue(
-        '/response/lst[@name="responseHeader"]/int[@name="status"]' );
-    $self->status_code( "$status" );
-    $self->status_message( "$status" );
+sub _build_docs {
+    my $self   = shift;
+    my $struct = $self->content;
+
+    return unless exists $struct->{ response }->{ docs };
+
+    return [ map { WebService::Solr::Document->new( %$_ ) }
+            @{ $struct->{ response }->{ docs } } ];
+}
+
+sub _build_pager {
+    my $self   = shift;
+    my $struct = $self->content;
+
+    return unless exists $struct->{ response }->{ numFound };
+    my $total = $struct->{ response }->{ numFound };
+    my $rows  = $struct->{ responseHeader }->{ params }->{ rows } || 10;
+    my $start = $struct->{ response }->{ start };
+
+    my $pager = Data::Page->new;
+    $pager->total_entries( $total );
+    $pager->entries_per_page( $rows );
+    $pager->current_page( $start / ( $rows - 1 ) + 1 );
+    return $pager;
+}
+
+sub solr_status {
+    return shift->content->{ responseHeader }->{ status };
 }
 
 sub ok {
-    return shift->status_code == 0;
+    my $status = shift->solr_status;
+    return defined $status && $status == 0;
 }
 
 no Moose;

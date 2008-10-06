@@ -1,4 +1,4 @@
-use Test::More tests => 12;
+use Test::More tests => 22;
 
 use strict;
 use warnings;
@@ -30,18 +30,21 @@ my @field_objs = map { WebService::Solr::Field->new( @$_ ) } @fields;
 
     {
         my $doc = WebService::Solr::Document->new( @fields[ 0 .. 4 ] );
+        isa_ok( $doc, 'WebService::Solr::Document' );
         $doc->boost( '3.0' );
         is( $doc->to_xml, $expect, 'to_xml(), array refs' );
     }
 
     {
         my $doc = WebService::Solr::Document->new( @field_objs[ 0 .. 4 ] );
+        isa_ok( $doc, 'WebService::Solr::Document' );
         $doc->boost( '3.0' );
         is( $doc->to_xml, $expect, 'to_xml(), objs' );
     }
 
     {
         my $doc = WebService::Solr::Document->new();
+        isa_ok( $doc, 'WebService::Solr::Document' );
         $doc->boost( '3.0' );
         $doc->add_fields( @field_objs[ 0 .. 4 ] );
         is( $doc->to_xml, $expect, 'to_xml(), add_fields()' );
@@ -53,6 +56,7 @@ my @field_objs = map { WebService::Solr::Field->new( @$_ ) } @fields;
             @fields[ 1 .. 3 ],
             $field_objs[ 4 ]
         );
+        isa_ok( $doc, 'WebService::Solr::Document' );
         $doc->boost( '3.0' );
         is( $doc->to_xml, $expect, 'to_xml(), mixed' );
     }
@@ -60,6 +64,7 @@ my @field_objs = map { WebService::Solr::Field->new( @$_ ) } @fields;
 
 {
     my $doc = WebService::Solr::Document->new( key => 'value' );
+    isa_ok( $doc, 'WebService::Solr::Document' );
     is( $doc->to_xml,
         '<doc><field name="key">value</field></doc>',
         'to_xml(), key=>val'
@@ -69,6 +74,7 @@ my @field_objs = map { WebService::Solr::Field->new( @$_ ) } @fields;
 {
     my $doc
         = WebService::Solr::Document->new( key => 'value', $field_objs[ 0 ] );
+    isa_ok( $doc, 'WebService::Solr::Document' );
     is( $doc->to_xml,
         '<doc><field name="key">value</field><field boost="1.6" name="id">1</field></doc>',
         'to_xml(), key=>val + obj'
@@ -78,6 +84,7 @@ my @field_objs = map { WebService::Solr::Field->new( @$_ ) } @fields;
 {
     my $doc
         = WebService::Solr::Document->new( $field_objs[ 0 ], key => 'value' );
+    isa_ok( $doc, 'WebService::Solr::Document' );
     is( $doc->to_xml,
         '<doc><field boost="1.6" name="id">1</field><field name="key">value</field></doc>',
         'to_xml(), obj + key=>val'
@@ -87,6 +94,7 @@ my @field_objs = map { WebService::Solr::Field->new( @$_ ) } @fields;
 {
     my $doc = WebService::Solr::Document->new( @field_objs[ 0 .. 4 ],
         $field_objs[ 1 ] );
+    isa_ok( $doc, 'WebService::Solr::Document' );
 
     {
         my @values = $doc->values_for( 'id' );
@@ -106,5 +114,10 @@ my @field_objs = map { WebService::Solr::Field->new( @$_ ) } @fields;
         my @values = $doc->values_for( 'dne' );
         is_deeply( \@values, [], 'values_for() -- no values' );
     }
+}
 
+{
+    my $doc = WebService::Solr::Document->new( x => [ 1, 2, 3 ] );
+    isa_ok( $doc, 'WebService::Solr::Document' );
+    is( scalar @{ $doc->fields }, 3, 'arrayref of values to fields' );
 }

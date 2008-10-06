@@ -1,39 +1,44 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 22;
+use Test::Mock::LWP::UserAgent;
 
-BEGIN {
-    use_ok( 'WebService::Solr::Request::Commit' );
-}
+use XML::Simple;
 
-{
-    my $r = WebService::Solr::Request::Commit->new;
-    isa_ok( $r, 'WebService::Solr::Request::Commit' );
-    is( $r->to_xml,
-        make_xml( waitFlush => 1, waitSearcher => 1 ),
-        'commit (defaults)'
-    );
-}
-
-{
-    for (
-        { waitFlush => 1, waitSearcher => 1 },
-        { waitFlush => 1, waitSearcher => 0 },
-        { waitFlush => 0, waitSearcher => 0 },
-        { waitFlush => 0, waitSearcher => 0 },
-        )
-    {
-        my $r = WebService::Solr::Request::Commit->new( %$_ );
-        isa_ok( $r, 'WebService::Solr::Request::Commit' );
-        is( $r->to_xml, make_xml( %$_ ), 'commit w/ options' );
+$Mock_ua->mock(
+    request => sub {
+        _test_req( @{ $_[ 1 ]->new_args } );
+        return HTTP::Response->new;
     }
+);
+
+use_ok( 'WebService::Solr' );
+my $solr = WebService::Solr->new;
+isa_ok( $solr, 'WebService::Solr' );
+
+my $opt;
+for (
+    {},
+    { waitFlush => 'true',  waitSearcher => 'true' },
+    { waitFlush => 'true',  waitSearcher => 'false' },
+    { waitFlush => 'false', waitSearcher => 'true' },
+    { waitFlush => 'false', waitSearcher => 'false' },
+    )
+{
+    $opt = $_;
+    $solr->commit( $_ );
 }
 
-sub make_xml {
-    my %opts = @_;
-    $opts{ $_ } = $opts{ $_ } ? 'true' : 'false'
-        for qw( waitFlush waitSearcher );
-    return
-        qq(<commit waitFlush="$opts{waitFlush}" waitSearcher="$opts{waitSearcher}" />);
+sub _test_req {
+    is( $_[ 2 ]->path, '/solr/update', 'commit() path' );
+    is_deeply( { $_[ 2 ]->query_form }, { wt => 'json' }, 'commit() params' );
+    is_deeply(
+        $_[ 3 ],
+        [ 'Content_Type', 'text/xml; charset=utf-8' ],
+        'commit() headers'
+    );
+    my $struct = XMLin( $_[ 4 ], KeepRoot => 1 );
+    is_deeply( $struct, { commit => $opt }, 'commit() xml' );
 }
+

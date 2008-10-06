@@ -52,7 +52,7 @@ sub _build_pager {
     my $pager = Data::Page->new;
     $pager->total_entries( $total );
     $pager->entries_per_page( $rows );
-    $pager->current_page( $start / $rows) + 1 );
+    $pager->current_page( $start / $rows + 1 );
     return $pager;
 }
 

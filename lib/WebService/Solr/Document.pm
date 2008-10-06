@@ -66,3 +66,41 @@ no Moose;
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
+
+=head1 NAME
+
+WebService::Solr::Document - A document object
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 new( @fields|\@fields )
+
+=head2 BUILDARGS( )
+
+=head2 add_fields( @fields|\@fields )
+
+=head2 values_for( $name )
+
+=head2 to_xml( )
+
+=head1 AUTHORS
+
+Brian Cassidy E<lt>bricas@cpan.orgE<gt>
+
+Kirk Beers E<lt>kirk.beers@nald.caE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2008 National Adult Literacy Database
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut
+

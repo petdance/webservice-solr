@@ -140,3 +140,59 @@ sub _send_update {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+WebService::Solr - Module to interface with the Solr (Lucene) webservice
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 new( $url, \%options )
+
+=head2 BUILDARGS( )
+
+=head2 add( $doc|\@docs, \%options )
+
+=head2 update( $doc|\@docs, \%options )
+
+=head2 delete_by_id( $id )
+
+=head2 delete_by_query( $query )
+
+=head2 search( $query, \%options )
+
+=head2 commit( \%options )
+
+=head2 optimize( \%options )
+
+=head2 ping( )
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * http://lucene.apache.org/solr/
+
+=back
+
+=head1 AUTHORS
+
+Brian Cassidy E<lt>bricas@cpan.orgE<gt>
+
+Kirk Beers E<lt>kirk.beers@nald.caE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2008 National Adult Literacy Database
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut
+

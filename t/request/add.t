@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 10;
 use Test::Mock::LWP::UserAgent;
 
 use XML::Simple;
@@ -22,6 +22,7 @@ my $expect;
 {
     $expect = { doc => { field => { name => 'foo', content => 'bar' } } };
     $solr->add( { foo => 'bar' } );
+    $solr->update( { foo => 'bar' } );
 }
 
 sub _test_req {
@@ -33,5 +34,5 @@ sub _test_req {
         'add() headers'
     );
     my $struct = XMLin( $_[ 4 ], KeepRoot => 1 );
-    is_deeply( $struct, { add => $expect }, 'add() xml' );
+    is_deeply( $struct, { add => $expect }, 'add/update xml' );
 }

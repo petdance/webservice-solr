@@ -6,6 +6,7 @@ use URI;
 use LWP::UserAgent;
 use WebService::Solr::Request::AddDocument;
 use WebService::Solr::Request::Commit;
+use WebService::Solr::Request::Optimize;
 use WebService::Solr::Response;
 use HTTP::Request;
 
@@ -59,14 +60,23 @@ sub commit {
     return $response->success;
 }
 
+sub optimize {
+    my ( $self ) = @_;
+    my $response = $self->send( WebService::Solr::Request::Optimize->new );
+    return $response->success;
+}
+
 sub send {
     my ( $self, $request ) = @_;
     my $http_req = HTTP::Request->new(
         POST => $self->url . '/' . $request->handler,
         [ Content_Type => $request->content_type ], $request->to_xml . ''
     );
-    my $http_res = $self->agent->post( $http_req );
 
+    #use Data::Dumper; die Dumper $http_req;
+    my $http_res = $self->agent->request( $http_req );
+
+    #use Data::Dumper; die Dumper $http_res;
     return WebService::Solr::Response->new( $request, $http_res );
 }
 

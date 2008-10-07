@@ -36,6 +36,13 @@ sub BUILDARGS {
         $options->{ url } = ref $url ? $url : URI->new( $url );
     }
 
+    if( exists $options->{ default_params } ) {
+        $options->{ default_params } = {
+            %{ $options->{ default_params } },
+            wt => 'json',
+        }
+    }
+
     return $options;
 }
 
@@ -151,35 +158,116 @@ WebService::Solr - Module to interface with the Solr (Lucene) webservice
 
 =head1 SYNOPSIS
 
+    my $solr = WebService::Solr->new;
+    $solr->add( @docs );
+    $solr->commit;
+    
+    my $response = $solr->search( $query );
+    for my $doc ( $response->docs ) {
+        print $doc->value_for( $id );
+    }
+
 =head1 DESCRIPTION
+
+
+
+=head1 ACCESSORS
+
+=over 4
+
+=item * url - the webservice base url
+
+=item * agent - a user agent object
+
+=item * autocommit - a boolean value for automatic commit() after add/update/delete
+
+=item * default_params - a hashref of parameters to send on every request
+
+=back
 
 =head1 METHODS
 
 =head2 new( $url, \%options )
 
-=head2 BUILDARGS( )
+Creates a new WebService::Solr instance. If C<$url> is omitted, then
+C<http://localhost:8983/solr> is used as a default. Available options are
+listed in the L<ACCESSORS|/"ACCESSORS"> section.
+
+=head2 BUILDARGS( @args )
+
+A Moose override to allow our custom constructor.
 
 =head2 add( $doc|\@docs, \%options )
 
+Adds a number of documents to the index. Returns true on success, false
+otherwise. A document can be a L<WebService::Solr::Document> object or a
+structure that can be passed to C<WebService::Solr::Document->new>. Available
+options as of Solr 1.3 are:
+
+=over 4
+
+=item * allowDups (default: false) - Allow duplicate entries
+
+=back
+
 =head2 update( $doc|\@docs, \%options )
+
+Alias for C<add()>.
 
 =head2 delete_by_id( $id )
 
+Deletes all documents matching the id specified. Returns true on success,
+false otherwise.
+
 =head2 delete_by_query( $query )
+
+Deletes documents matching C<$query>. Returns true on success, false
+otherwise.
 
 =head2 search( $query, \%options )
 
+Searches the index given a C<$query>. Returns a L<WebService::Solr::Response>
+object. All key-value pairs supplied in C<\%options> are serialzied in the
+request URL.
+
 =head2 commit( \%options )
+
+Sends a commit command. Returns true on success, false otherwise. You must do
+a commit after an add, update or delete. You can turn autocommit on to have
+the library do it for you:
+
+    my $solr = WebService::Solr->new( undef, { autocommit => 1 } );
+    $solr->add( $doc ); # will not automatically call commit()
+
+Options as of Solr 1.3 include:
+
+=over 4
+
+=item * maxSegments (default: 1)
+
+=item * waitFlush (default: true)
+
+=item * waitSearcher (default: true)
+
+=back
 
 =head2 optimize( \%options )
 
+Sends an optimize command. Returns true on success, false otherwise.
+
+Options as of Solr 1.3 are the same as C<commit()>.
+
 =head2 ping( )
+
+Sends a basic ping request. Returns true on success, false otherwise.
 
 =head1 SEE ALSO
 
 =over 4
 
 =item * http://lucene.apache.org/solr/
+
+=item * L<Solr> - an alternate library
 
 =back
 

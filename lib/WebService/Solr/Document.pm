@@ -48,6 +48,11 @@ sub _parse_fields {
     return @new_fields;
 }
 
+sub value_for {
+    my @values = shift->values_for( shift );
+    return $values[ 0 ];
+}
+
 sub values_for {
     my ( $self, $key ) = @_;
     return map { $_->value } grep { $_->name eq $key } $self->fields;
@@ -75,19 +80,54 @@ WebService::Solr::Document - A document object
 
 =head1 SYNOPSIS
 
+    my $doc = WebService::Solr::Document->new;
+    $doc->add_fields( @fields );
+    $doc->boost( 2.0 );
+    my $id = $doc->value_for( 'id' );
+    my @subjects = $doc->values_for( 'subject' );
+
 =head1 DESCRIPTION
+
+This class represents a basic document object, which is basically
+a collection of fields. 
+
+=head1 ACCESSORS
+
+=over 4
+
+=item * fields - an array of fields
+
+=item * boost - a floating-point "boost" value
+
+=back
 
 =head1 METHODS
 
 =head2 new( @fields|\@fields )
 
-=head2 BUILDARGS( )
+Constructs a new document object given C<@fields>. A field can be a
+L<WebService::Solr::Field> object, or a structure accepted by
+C<WebService::Solr::Field->new>.
+
+=head2 BUILDARGS( @args )
+
+A Moose override to allow our custom constructor.
 
 =head2 add_fields( @fields|\@fields )
 
+Adds C<@fields> to the document.
+
+=head2 value_for( $name )
+
+Returns the first value for C<$name>.
+
 =head2 values_for( $name )
 
+Returns all values for C<$name>.
+
 =head2 to_xml( )
+
+Serializes the object to xml.
 
 =head1 AUTHORS
 

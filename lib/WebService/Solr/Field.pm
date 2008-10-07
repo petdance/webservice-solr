@@ -39,15 +39,39 @@ WebService::Solr::Field - A field object
 
 =head1 SYNOPSIS
 
+    my $field = WebService::Solr::Field->new( foo => 'bar' );
+
 =head1 DESCRIPTION
+
+This class represents a field from a document, which is basically a
+name-value pair.
+
+=head1 ACCESSORS
+
+=over 4
+
+=item * name - the field's name
+
+=item * value - the field's value
+
+=item * boost - a floating-point boost value
+
+=back
 
 =head1 METHODS
 
 =head2 new( $name => $value, \%options )
 
-=head2 BUILDARGS( )
+Creates a new field object. Currently, the only option available is a
+"boost" value.
+
+=head2 BUILDARGS( @args )
+
+A Moose override to allow our custom constructor.
 
 =head2 to_xml( )
+
+Serializes the object to xml.
 
 =head1 AUTHORS
 

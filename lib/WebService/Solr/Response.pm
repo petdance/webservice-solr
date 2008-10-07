@@ -79,17 +79,50 @@ WebService::Solr::Response - Parse responses from Solr
 
 =head1 SYNOPSIS
 
+    my $res = WebService::Solr::Response->new( $http_res );
+    for my $doc( $res->docs ) {
+        print $doc->value_for( 'id'), "\n";
+    }
+    my $pager = $res->pager;
+
 =head1 DESCRIPTION
+
+This class encapsulates reponses from the Solr Web Service. Typically it is
+used when documents are returned from a search query, though it will accept
+all responses from the service.
+
+=head1 ACCESSORS
+
+=over 4
+
+=item * raw_response - the raw L<HTTP::Response> object.
+
+=item * content - a hashref of deserialized JSON data from the response.
+
+=item * docs - an array of L<WebService::Solr::Document> objects.
+
+=item * pager - a L<Data::Page> object for the search results.
+
+=back
 
 =head1 METHODS
 
 =head2 new( $response )
 
-=head2 BUILDARGS( )
+Given an L<HTTP::Response> object, it will parse the returned data as
+required.
+
+=head2 BUILDARGS( @args )
+
+A Moose override to allow our custom constructor.
 
 =head2 solr_status( )
 
+Looks for the status value in the respons data.
+
 =head2 ok( )
+
+Calls C<solr_status()> and check that it is equal to 0.
 
 =head1 AUTHORS
 

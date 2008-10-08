@@ -1,8 +1,9 @@
 package WebService::Solr::Response;
 
 use Moose;
-use WebService::Solr::Document;
 
+use WebService::Solr::Document;
+use Data::Page;
 use JSON::XS ();
 
 has 'raw_response' => (

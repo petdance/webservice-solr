@@ -121,7 +121,7 @@ required.
 
 A Moose override to allow our custom constructor.
 
-=head2 face_counts( )
+=head2 facet_counts( )
 
 A shortcut to the C<facet_counts> key in the response data.
 

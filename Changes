@@ -2,6 +2,7 @@ Revision history for Perl extension WebService::Solr.
 
 0.02  XXX
     - fix pager creation
+    - add a simple facet_counts() shortcut method
 
 0.01  Tue Oct 07 2008
     - original version;

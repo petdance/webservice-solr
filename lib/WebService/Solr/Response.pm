@@ -57,6 +57,10 @@ sub _build_pager {
     return $pager;
 }
 
+sub facet_counts {
+    return  shift->content->{ facet_counts };
+}
+
 sub solr_status {
     return shift->content->{ responseHeader }->{ status };
 }
@@ -116,6 +120,10 @@ required.
 =head2 BUILDARGS( @args )
 
 A Moose override to allow our custom constructor.
+
+=head2 face_counts( )
+
+A shortcut to the C<facet_counts> key in the response data.
 
 =head2 solr_status( )
 

@@ -92,7 +92,7 @@ WebService::Solr::Response - Parse responses from Solr
 
 =head1 DESCRIPTION
 
-This class encapsulates reponses from the Solr Web Service. Typically it is
+This class encapsulates responses from the Solr Web Service. Typically it is
 used when documents are returned from a search query, though it will accept
 all responses from the service.
 
@@ -127,7 +127,7 @@ A shortcut to the C<facet_counts> key in the response data.
 
 =head2 solr_status( )
 
-Looks for the status value in the respons data.
+Looks for the status value in the response data.
 
 =head2 ok( )
 

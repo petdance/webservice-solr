@@ -201,7 +201,7 @@ A Moose override to allow our custom constructor.
 
 Adds a number of documents to the index. Returns true on success, false
 otherwise. A document can be a L<WebService::Solr::Document> object or a
-structure that can be passed to C<WebService::Solr::Document->new>. Available
+structure that can be passed to C<WebService::Solr::Document-E<gt>new>. Available
 options as of Solr 1.3 are:
 
 =over 4

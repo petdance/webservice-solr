@@ -107,7 +107,7 @@ a collection of fields.
 
 Constructs a new document object given C<@fields>. A field can be a
 L<WebService::Solr::Field> object, or a structure accepted by
-C<WebService::Solr::Field->new>.
+C<WebService::Solr::Field-E<gt>new>.
 
 =head2 BUILDARGS( @args )
 

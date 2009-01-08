@@ -4,6 +4,7 @@ Revision history for Perl extension WebService::Solr.
     - fix typo (Thanks cog)
     - pod fixes
     - try to work around old LWP versions when setting HTTP headers
+    - require URI >= 1.28
 
 0.02  Thu Oct 09 2008
     - fix pager creation, missing prereq

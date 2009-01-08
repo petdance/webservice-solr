@@ -10,7 +10,7 @@ name 'WebService-Solr';
 all_from 'lib/WebService/Solr.pm';
 
 requires 'LWP::UserAgent';
-requires 'URI';
+requires 'URI' => '1.28';
 requires 'Data::Page';
 requires 'XML::Generator';
 requires 'JSON::XS';

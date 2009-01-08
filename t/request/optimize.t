@@ -5,6 +5,7 @@ use Test::More tests => 22;
 use Test::Mock::LWP::UserAgent;
 
 use XML::Simple;
+use HTTP::Headers;
 
 $Mock_ua->mock(
     request => sub {
@@ -37,9 +38,9 @@ sub _test_req {
         { wt => 'json' },
         'optimize() params'
     );
-    is_deeply(
-        $_[ 3 ],
-        [ 'Content_Type', 'text/xml; charset=utf-8' ],
+    is(
+        $_[ 3 ]->header( 'Content_Type' ),
+        'text/xml; charset=utf-8',
         'optimize() headers'
     );
     my $struct = XMLin( $_[ 4 ], KeepRoot => 1 );

@@ -5,6 +5,7 @@ use Test::More tests => 10;
 use Test::Mock::LWP::UserAgent;
 
 use XML::Simple;
+use HTTP::Headers;
 
 $Mock_ua->mock(
     request => sub {
@@ -32,9 +33,9 @@ my $expect;
 sub _test_req {
     is( $_[ 2 ]->path, '/solr/update', 'delete() path' );
     is_deeply( { $_[ 2 ]->query_form }, { wt => 'json' }, 'delete() params' );
-    is_deeply(
-        $_[ 3 ],
-        [ 'Content_Type', 'text/xml; charset=utf-8' ],
+    is(
+        $_[ 3 ]->header( 'Content_Type' ),
+        'text/xml; charset=utf-8',
         'delete() headers'
     );
     my $struct = XMLin( $_[ 4 ], KeepRoot => 1 );

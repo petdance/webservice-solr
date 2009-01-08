@@ -6,6 +6,7 @@ use URI;
 use LWP::UserAgent;
 use WebService::Solr::Response;
 use HTTP::Request;
+use HTTP::Headers;
 use XML::Generator;
 
 has 'url' => (
@@ -136,7 +137,7 @@ sub _send_update {
     my $url = $self->_gen_url( 'update', $params );
     my $req = HTTP::Request->new(
         POST => $url,
-        [ Content_Type => 'text/xml; charset=utf-8' ],
+        HTTP::Headers->new( Content_Type => 'text/xml; charset=utf-8' ),
         '<?xml version="1.0" encoding="UTF-8"?>' . $xml
     );
 

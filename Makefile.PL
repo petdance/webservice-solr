@@ -22,5 +22,4 @@ test_requires 'Test::Mock::LWP';
 
 tests_recursive;
 
-auto_install;
 WriteAll;

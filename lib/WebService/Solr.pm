@@ -161,8 +161,7 @@ WebService::Solr - Module to interface with the Solr (Lucene) webservice
 
     my $solr = WebService::Solr->new;
     $solr->add( @docs );
-    $solr->commit;
-    
+        
     my $response = $solr->search( $query );
     for my $doc ( $response->docs ) {
         print $doc->value_for( $id );
@@ -239,6 +238,7 @@ the library do it for you:
 
     my $solr = WebService::Solr->new( undef, { autocommit => 1 } );
     $solr->add( $doc ); # will not automatically call commit()
+    $solr->commit;
 
 Options as of Solr 1.3 include:
 
@@ -280,7 +280,7 @@ Kirk Beers E<lt>kirk.beers@nald.caE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008 National Adult Literacy Database
+Copyright 2008-2009 National Adult Literacy Database
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

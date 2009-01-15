@@ -1,6 +1,6 @@
 Revision history for Perl extension WebService::Solr.
 
-0.03  XXX
+0.03  Thu Jan 15 2009
     - fix typo (Thanks cog)
     - pod fixes
     - try to work around old LWP versions when setting HTTP headers

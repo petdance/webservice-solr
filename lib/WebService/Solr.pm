@@ -27,7 +27,7 @@ has 'default_params' => (
     default    => sub { { wt => 'json' } }
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub BUILDARGS {
     my ( $self, $url, $options ) = @_;
@@ -148,6 +148,10 @@ sub _send_update {
 
     return $res;
 }
+
+no Moose;
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

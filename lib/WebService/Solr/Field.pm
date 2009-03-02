@@ -19,7 +19,7 @@ sub BUILDARGS {
 
 sub to_xml {
     my $self = shift;
-    my $gen  = XML::Generator->new( ':std' );
+    my $gen  = XML::Generator->new( ':std', escape => 'always,even-entities' );
     my %attr = ( $self->boost ? ( boost => $self->boost ) : () );
 
     return $gen->field( { name => $self->name, %attr }, $self->value );

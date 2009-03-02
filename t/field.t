@@ -1,4 +1,4 @@
-use Test::More tests => 8;
+use Test::More tests => 10;
 
 use strict;
 use warnings;
@@ -34,3 +34,18 @@ BEGIN { use_ok( 'WebService::Solr::Field' ); }
     ok( !defined $f, 'value required' );
     ok( $@,          'value required' );
 }
+
+# XML escaping
+
+{
+    my $f = WebService::Solr::Field->new( foo => 'This & That' );
+    my $expected = '<field name="foo">This &amp; That</field>';
+    is( $f->to_xml, $expected, 'to_xml(), escaped (1)' );
+}
+
+{
+    my $f = WebService::Solr::Field->new( foo => 'This &amp; That' );
+    my $expected = '<field name="foo">This &amp;amp; That</field>';
+    is( $f->to_xml, $expected, 'to_xml(), escaped (2)' );
+}
+

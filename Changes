@@ -1,6 +1,6 @@
 Revision history for Perl extension WebService::Solr.
 
-0.04  XXX
+0.04  Mon Mar 02 2009
     - add make_immutable to Solr.pm
     - be paranoid about XML escaping (Gert Brinkmann)
 

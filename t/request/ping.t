@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 3;
-use Test::Mock::LWP::UserAgent;
+use Test::Mock::LWP;
 
 $Mock_ua->mock(
     get => sub {
@@ -10,6 +10,7 @@ $Mock_ua->mock(
         return HTTP::Response->new;
     }
 );
+$Mock_response->mock( is_error => sub { return 0 } );
 
 use_ok( 'WebService::Solr' );
 my $solr = WebService::Solr->new();

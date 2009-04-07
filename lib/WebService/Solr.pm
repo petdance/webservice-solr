@@ -142,8 +142,12 @@ sub _send_update {
         '<?xml version="1.0" encoding="UTF-8"?>' . $xml
     );
 
-    my $res
-        = WebService::Solr::Response->new( $self->agent->request( $req ) );
+    my $http_response = $self->agent->request($req);
+    if ( $http_response->is_error ) {
+        confess $http_response->status_line . ': ' . $http_response->content;
+    }
+
+    my $res = WebService::Solr::Response->new($http_response);
 
     $self->commit if $autocommit;
 

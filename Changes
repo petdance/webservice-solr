@@ -1,6 +1,6 @@
 Revision history for Perl extension WebService::Solr.
 
-0.05
+0.05  Mon Apr 13 2009
     - Confess upon HTTP error (Leon Brocard)
     - Send UTF-8 requests to keep new LWP happy (Leon Brocard)
 

@@ -1,5 +1,10 @@
 Revision history for Perl extension WebService::Solr.
 
+0.06  Thu May 07 2009
+    - Add auto_suggest to hit the new Solr 1.4 /autoSuggest API (RT #45798)
+    - Refactor a basic GET request into its own public
+      method (generic_solr_request)
+
 0.05  Mon Apr 13 2009
     - Confess upon HTTP error (Leon Brocard)
     - Send UTF-8 requests to keep new LWP happy (Leon Brocard)

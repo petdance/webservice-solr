@@ -28,7 +28,7 @@ has 'default_params' => (
     default    => sub { { wt => 'json' } }
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub BUILDARGS {
     my ( $self, $url, $options ) = @_;
@@ -117,8 +117,18 @@ sub search {
     my ( $self, $query, $params ) = @_;
     $params ||= {};
     $params->{ 'q' } = $query;
+    return $self->generic_solr_request( 'select', $params );
+}
+
+sub auto_suggest {
+    shift->generic_solr_request( 'autoSuggest', @_ );
+}
+
+sub generic_solr_request {
+    my ( $self, $path, $params ) = @_;
+    $params ||= {};
     my $response = WebService::Solr::Response->new(
-        $self->agent->get( $self->_gen_url( 'select', $params ) ) );
+        $self->agent->get( $self->_gen_url( $path, $params ) ) );
     return $response;
 }
 
@@ -240,6 +250,11 @@ Searches the index given a C<$query>. Returns a L<WebService::Solr::Response>
 object. All key-value pairs supplied in C<\%options> are serialzied in the
 request URL.
 
+=head2 auto_suggest( \%options )
+
+Get suggestions from a list of terms for a given field. The Solr wiki has
+more details about the available options (http://wiki.apache.org/solr/TermsComponent)
+
 =head2 commit( \%options )
 
 Sends a commit command. Returns true on success, false otherwise. You must do
@@ -271,6 +286,13 @@ Options as of Solr 1.3 are the same as C<commit()>.
 =head2 ping( )
 
 Sends a basic ping request. Returns true on success, false otherwise.
+
+=head2 generic_solr_request( $path, \%query )
+
+Performs a simple C<GET> request appending C<$path> to the base URL
+and using key-value pairs from C<\%query> to generate the query string. This
+should allow you to access parts of the Solr API that don't yet have their
+own correspodingly named function (e.g. C<dataimport> ).
 
 =head1 SEE ALSO
 

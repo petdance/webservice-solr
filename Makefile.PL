@@ -22,4 +22,6 @@ test_requires 'Test::Mock::LWP';
 
 tests_recursive;
 
+repository 'http://github.com/bricas/webservice-solr';
+
 WriteAll;

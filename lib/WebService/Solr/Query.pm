@@ -35,7 +35,9 @@ sub stringify {
             @values = ( $self->$op( $params ) );
         }
 
-        $out .= join( ' ', map { qq($key:$_) } @values );
+        my $field = $key eq '-default' ? '' : "$key:";
+
+        $out .= join( ' ', map { qq($field$_) } @values );
         $out .= ' ';
     }
 
@@ -101,6 +103,34 @@ __END__
 =head1 NAME
 
 WebService::Solr::Query - Abstract query syntax for Solr queries
+
+=head1 ACCESSORS
+
+=over 4
+
+=item * query - stores the original query structure
+
+=back
+
+=head1 METHODS
+
+=head1 new( \%query )
+
+Creates a new query object with the given hashref.
+
+=head1 stringify( )
+
+Converts the supplied structure into a Solr/Lucene query.
+
+=head1 escape( $value )
+
+The following values must be escaped in a search value:
+
+    + - & | ! ( ) { } [ ] ^ " ~ * ? : \
+
+=head1 unescape( $value )
+
+Unescapes values escaped in C<escape()>.
 
 =head1 SEE ALSO
 

@@ -13,10 +13,17 @@ BEGIN {
 }
 
 { # basic queries
+    # default field
+    _check( query => { -default => 'space' }, expect => '"space"' );
+    _check( query => { -default => [ 'star trek', 'star wars' ] }, expect => '"star trek" "star wars"' );
+
+    # field
     _check( query => { title => 'Spaceballs' }, expect => 'title:"Spaceballs"' );
     _check( query => { first => 'Roger', last => 'Moore' }, expect => 'first:"Roger" last:"Moore"' );
     _check( query => { first => [ 'Roger', 'Dodger' ] }, expect => 'first:"Roger" first:"Dodger"' );
     _check( query => { first => [ 'Roger', 'Dodger' ], last => 'Moore' }, expect => 'first:"Roger" first:"Dodger" last:"Moore"' );
+
+    _check( query => { first => [ 'Roger', 'Dodger' ], -default => [ 'star trek', 'star wars' ] }, expect => '"star trek" "star wars" first:"Roger" first:"Dodger"' );
 }
 
 { # basic query with escape
@@ -43,6 +50,12 @@ BEGIN {
     # fuzzy
     _check( query => { title => { -fuzzy => [ 'space', '0.8' ] } }, expect => 'title:space~0.8' );
     _check( query => { first => [ 'Roger', 'Dodger' ], title => { -fuzzy => [ 'space', '0.8' ] } }, expect => 'first:"Roger" first:"Dodger" title:space~0.8' );
+}
+
+{ # ops with escape
+    _check( query => { title => { -boost => [ 'Sp(a)ce', '2.0' ] } }, expect => 'title:"Sp\(a\)ce"^2.0' );
+    _check( query => { title => { -proximity => [ 'sp(a)ce balls', '10' ] } }, expect => 'title:"sp\(a\)ce balls"~10' );
+    _check( query => { title => { -fuzzy => [ 'sp(a)ce', '0.8' ] } }, expect => 'title:sp\(a\)ce~0.8' );
 }
 
 sub _check {

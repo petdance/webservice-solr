@@ -4,6 +4,8 @@ use Moose;
 
 use overload q("") => 'stringify';
 
+my $escape_chars = quotemeta('+-&|!(){}[]^"~*?:\\');
+
 has 'query' => ( is => 'ro', isa => 'HashRef', default => sub{ {} }, auto_deref => 1 );
 
 sub BUILDARGS {
@@ -23,9 +25,9 @@ sub stringify {
     my %query = $self->query;
 
     for my $key ( sort keys %query ) {
-        my @values = qq("$query{$key}");
+        my @values = '"' . $self->escape($query{$key}) . '"';
         if( ref $query{$key} eq 'ARRAY' ) {
-            @values = map { qq("$_") } @{ $query{$key} };
+            @values = map { qq("$_") } map { $self->escape( $_ ) } @{ $query{$key} };
         }
         elsif( ref $query{$key} eq 'HASH' ) {
             my( $op, $params ) = %{ $query{$key} };
@@ -45,6 +47,47 @@ sub _op_range {
     my $self = shift;
     my @vals = @{ shift() };
     return "[$vals[ 0 ] TO $vals[ 1 ]]";
+}
+
+*_op_range_inc = \&_op_range;
+
+sub _op_range_exc {
+    my $self = shift;
+    my @vals = @{ shift() };
+    return "{$vals[ 0 ] TO $vals[ 1 ]}";
+}
+
+sub _op_boost {
+    my $self = shift;
+    my( $val, $boost ) = @{ shift() };
+    $val = $self->escape( $val );
+    return qq("$val"^$boost);
+}
+ 
+sub _op_fuzzy {
+    my $self = shift;
+    my( $val, $distance ) = @{ shift() };
+    $val = $self->escape( $val );
+    return qq($val~$distance);
+}
+ 
+sub _op_proximity {
+    my $self = shift;
+    my( $val, $distance ) = @{ shift() };
+    $val = $self->escape( $val );
+    return qq("$val"~$distance);
+}
+
+sub escape {
+    my( $self, $text ) = @_;
+    $text =~ s{([$escape_chars])}{\\$1}g;
+    return $text;
+}
+ 
+sub unescape {
+    my( $self, $text ) = @_;
+    $text =~ s{\\([$escape_chars])}{$1}g;
+    return $text;
 }
  
 no Moose;

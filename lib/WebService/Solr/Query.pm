@@ -2,6 +2,51 @@ package WebService::Solr::Query;
 
 use Moose;
 
+use overload q("") => 'stringify';
+
+has 'query' => ( is => 'ro', isa => 'HashRef', default => sub{ {} }, auto_deref => 1 );
+
+sub BUILDARGS {
+    my $class = shift;
+
+    if ( @_ == 1 ) {
+      return { query => $_[0] };
+    }
+
+    return $class->SUPER::BUILDARGS(@_);
+}
+
+sub stringify {
+    my $self = shift;
+
+    my $out = '';
+    my %query = $self->query;
+
+    for my $key ( sort keys %query ) {
+        my @values = qq("$query{$key}");
+        if( ref $query{$key} eq 'ARRAY' ) {
+            @values = map { qq("$_") } @{ $query{$key} };
+        }
+        elsif( ref $query{$key} eq 'HASH' ) {
+            my( $op, $params ) = %{ $query{$key} };
+            $op =~ s{^-(.+)}{_op_$1};
+            @values = ( $self->$op( $params ) );
+        }
+
+        $out .= join( ' ', map { qq($key:$_) } @values );
+        $out .= ' ';
+    }
+
+    $out =~ s{\s+$}{};
+    return $out;
+}
+
+sub _op_range {
+    my $self = shift;
+    my @vals = @{ shift() };
+    return "[$vals[ 0 ] TO $vals[ 1 ]]";
+}
+ 
 no Moose;
 
 __PACKAGE__->meta->make_immutable;

@@ -50,6 +50,7 @@ BEGIN {
 }
 
 {    # basic query with escape
+    _check( query => { -default => 'sp(a)ce' }, expect => '"sp\(a\)ce"' );
     _check(
         query  => { title => 'Spaceb(a)lls' },
         expect => 'title:"Spaceb\(a\)lls"'

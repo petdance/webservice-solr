@@ -4,33 +4,35 @@ use Moose;
 
 use overload q("") => 'stringify';
 
-my $escape_chars = quotemeta('+-&|!(){}[]^"~*?:\\');
+my $escape_chars = quotemeta( '+-&|!(){}[]^"~*?:\\' );
 
-has 'query' => ( is => 'ro', isa => 'HashRef', default => sub{ {} }, auto_deref => 1 );
+has 'query' =>
+    ( is => 'ro', isa => 'HashRef', default => sub { {} }, auto_deref => 1 );
 
 sub BUILDARGS {
     my $class = shift;
 
     if ( @_ == 1 ) {
-      return { query => $_[0] };
+        return { query => $_[ 0 ] };
     }
 
-    return $class->SUPER::BUILDARGS(@_);
+    return $class->SUPER::BUILDARGS( @_ );
 }
 
 sub stringify {
     my $self = shift;
 
-    my $out = '';
+    my $out   = '';
     my %query = $self->query;
 
     for my $key ( sort keys %query ) {
-        my @values = '"' . $self->escape($query{$key}) . '"';
-        if( ref $query{$key} eq 'ARRAY' ) {
-            @values = map { qq("$_") } map { $self->escape( $_ ) } @{ $query{$key} };
+        my @values = '"' . $self->escape( $query{ $key } ) . '"';
+        if ( ref $query{ $key } eq 'ARRAY' ) {
+            @values = map { qq("$_") }
+                map { $self->escape( $_ ) } @{ $query{ $key } };
         }
-        elsif( ref $query{$key} eq 'HASH' ) {
-            my( $op, $params ) = %{ $query{$key} };
+        elsif ( ref $query{ $key } eq 'HASH' ) {
+            my ( $op, $params ) = %{ $query{ $key } };
             $op =~ s{^-(.+)}{_op_$1};
             @values = ( $self->$op( $params ) );
         }
@@ -61,37 +63,37 @@ sub _op_range_exc {
 
 sub _op_boost {
     my $self = shift;
-    my( $val, $boost ) = @{ shift() };
+    my ( $val, $boost ) = @{ shift() };
     $val = $self->escape( $val );
     return qq("$val"^$boost);
 }
- 
+
 sub _op_fuzzy {
     my $self = shift;
-    my( $val, $distance ) = @{ shift() };
+    my ( $val, $distance ) = @{ shift() };
     $val = $self->escape( $val );
     return qq($val~$distance);
 }
- 
+
 sub _op_proximity {
     my $self = shift;
-    my( $val, $distance ) = @{ shift() };
+    my ( $val, $distance ) = @{ shift() };
     $val = $self->escape( $val );
     return qq("$val"~$distance);
 }
 
 sub escape {
-    my( $self, $text ) = @_;
+    my ( $self, $text ) = @_;
     $text =~ s{([$escape_chars])}{\\$1}g;
     return $text;
 }
- 
+
 sub unescape {
-    my( $self, $text ) = @_;
+    my ( $self, $text ) = @_;
     $text =~ s{\\([$escape_chars])}{$1}g;
     return $text;
 }
- 
+
 no Moose;
 
 __PACKAGE__->meta->make_immutable;

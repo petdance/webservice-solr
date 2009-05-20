@@ -139,6 +139,32 @@ BEGIN {
     );
 }
 
+{    # require and prohibit
+    _check(
+        query  => { title => { -require => 'star' } },
+        expect => '+title:"star"'
+    );
+    _check(
+        query => {
+            first => [ 'Roger', 'Dodger' ],
+            title => { -require => 'star' }
+        },
+        expect => 'first:"Roger" first:"Dodger" +title:"star"'
+    );
+
+    _check(
+        query  => { title => { -prohibit => 'star' } },
+        expect => '-title:"star"'
+    );
+    _check(
+        query => {
+            first => [ 'Roger', 'Dodger' ],
+            title => { -prohibit => 'star' }
+        },
+        expect => 'first:"Roger" first:"Dodger" -title:"star"'
+    );
+}
+
 sub _check {
     my %t = @_;
 

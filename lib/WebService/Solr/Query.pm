@@ -34,7 +34,7 @@ sub stringify {
         elsif ( ref $query{ $key } eq 'HASH' ) {
             my ( $op, $params ) = %{ $query{ $key } };
             $op =~ s{^-(.+)}{_op_$1};
-            @values = ( $self->$op( $params ) );
+            ( $key, @values ) = ( $self->$op( $key, $params ) );
         }
 
         my $field = $key eq '-default' ? '' : "$key:";
@@ -48,38 +48,48 @@ sub stringify {
 }
 
 sub _op_range {
-    my $self = shift;
+    my ( $self, $key ) = ( shift, shift );
     my @vals = @{ shift() };
-    return "[$vals[ 0 ] TO $vals[ 1 ]]";
+    return $key, "[$vals[ 0 ] TO $vals[ 1 ]]";
 }
 
 *_op_range_inc = \&_op_range;
 
 sub _op_range_exc {
-    my $self = shift;
+    my ( $self, $key ) = ( shift, shift );
     my @vals = @{ shift() };
-    return "{$vals[ 0 ] TO $vals[ 1 ]}";
+    return $key, "{$vals[ 0 ] TO $vals[ 1 ]}";
 }
 
 sub _op_boost {
-    my $self = shift;
+    my ( $self, $key ) = ( shift, shift );
     my ( $val, $boost ) = @{ shift() };
     $val = $self->escape( $val );
-    return qq("$val"^$boost);
+    return $key, qq("$val"^$boost);
 }
 
 sub _op_fuzzy {
-    my $self = shift;
+    my ( $self, $key ) = ( shift, shift );
     my ( $val, $distance ) = @{ shift() };
     $val = $self->escape( $val );
-    return qq($val~$distance);
+    return $key, qq($val~$distance);
 }
 
 sub _op_proximity {
-    my $self = shift;
+    my ( $self, $key ) = ( shift, shift );
     my ( $val, $distance ) = @{ shift() };
     $val = $self->escape( $val );
-    return qq("$val"~$distance);
+    return $key, qq("$val"~$distance);
+}
+
+sub _op_require {
+    my ( $self, $key, $value ) = @_;
+    return "+$key", '"' . $self->escape( $value ) . '"';
+}
+
+sub _op_prohibit {
+    my ( $self, $key, $value ) = @_;
+    return "-$key", '"' . $self->escape( $value ) . '"';
 }
 
 sub escape {

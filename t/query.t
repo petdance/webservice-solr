@@ -157,6 +157,12 @@ BEGIN {
         expect => '-title:"star"'
     );
     _check(
+        query  => { default => { -prohibit => 'foo' } },
+        expect => '-default:"foo"'
+    );
+ 
+
+   _check(
         query => {
             first => [ 'Roger', 'Dodger' ],
             title => { -prohibit => 'star' }

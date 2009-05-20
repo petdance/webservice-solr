@@ -26,6 +26,7 @@ sub stringify {
     my %query = $self->query;
 
     for my $key ( sort keys %query ) {
+        my $field = $key eq '-default' ? '' : $key;
         my @values = '"' . $self->escape( $query{ $key } ) . '"';
         if ( ref $query{ $key } eq 'ARRAY' ) {
             @values = map { qq("$_") }
@@ -34,11 +35,10 @@ sub stringify {
         elsif ( ref $query{ $key } eq 'HASH' ) {
             my ( $op, $params ) = %{ $query{ $key } };
             $op =~ s{^-(.+)}{_op_$1};
-            ( $key, @values ) = ( $self->$op( $key, $params ) );
+            ( $field, @values ) = ( $self->$op( $field, $params ) );
         }
 
-        my $field = $key eq '-default' ? '' : "$key:";
-
+        $field .= ':' unless $key eq '-default';
         $out .= join( ' ', map { qq($field$_) } @values );
         $out .= ' ';
     }

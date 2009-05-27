@@ -6,90 +6,147 @@ use overload q("") => 'stringify';
 
 my $escape_chars = quotemeta( '+-&|!(){}[]^"~*?:\\' );
 
-has 'query' =>
-    ( is => 'ro', isa => 'HashRef', default => sub { {} }, auto_deref => 1 );
+has 'query' => ( is => 'ro', isa => 'ArrayRef', default => sub { [] } );
 
 sub BUILDARGS {
     my $class = shift;
 
-    if ( @_ == 1 ) {
+    if ( @_ == 1 && ref $_[ 0 ] && ref $_[ 0 ] eq 'ARRAY' ) {
         return { query => $_[ 0 ] };
     }
 
-    return $class->SUPER::BUILDARGS( @_ );
+    return { query => \@_ };
 }
 
 sub stringify {
     my $self = shift;
 
-    my $out   = '';
-    my %query = $self->query;
+    return $self->_dispatch_struct( $self->query );
+}
 
-    for my $key ( sort keys %query ) {
-        my $field = $key eq '-default' ? '' : $key;
-        my @values = '"' . $self->escape( $query{ $key } ) . '"';
-        if ( ref $query{ $key } eq 'ARRAY' ) {
-            @values = map { qq("$_") }
-                map { $self->escape( $_ ) } @{ $query{ $key } };
-        }
-        elsif ( ref $query{ $key } eq 'HASH' ) {
-            my ( $op, $params ) = %{ $query{ $key } };
-            $op =~ s{^-(.+)}{_op_$1};
-            ( $field, @values ) = ( $self->$op( $field, $params ) );
-        }
+sub _dispatch_struct {
+    my ( $self, $struct ) = @_;
 
-        $field .= ':' unless $key eq '-default';
-        $out .= join( ' ', map { qq($field$_) } @values );
-        $out .= ' ';
+    my $method = '_struct_' . ref $struct;
+
+    return $self->$method( $struct );
+}
+
+sub _struct_HASH {
+    my ( $self, $struct ) = @_;
+
+    my @clauses;
+
+    for my $k ( keys %$struct ) {
+        my $v = $struct->{ $k };
+
+        if ( $k =~ m{^-(.+)} ) {
+            my $method = "_op_$1";
+            push @clauses, $self->$method( $v );
+        }
+        else {
+            push @clauses, $self->_dispatch_value( $k, $v );
+        }
     }
 
-    $out =~ s{\s+$}{};
-    return $out;
+    return join( ' AND ', @clauses );
+}
+
+sub _struct_ARRAY {
+    my ( $self, $struct ) = @_;
+    return
+          '('
+        . join( ' OR ', map { $self->_dispatch_struct( $_ ) } @$struct )
+        . ')';
+}
+
+sub _dispatch_value {
+    my ( $self, $k, $v ) = @_;
+
+    my $method = '_value_' . ( ref $v || 'SCALAR' );
+    return $self->$method( $k, $v );
+}
+
+sub _value_SCALAR {
+    my ( $self, $k, $v ) = @_;
+    $v = $self->escape( $v );
+    my $r = qq($k:"$v");
+    $r =~ s{^:}{};
+    return $r;
+}
+
+sub _value_HASH {
+    my ( $self, $k, $v ) = @_;
+
+    my @clauses;
+
+    for my $op ( keys %$v ) {
+        my $struct = $v->{ $op };
+        $op =~ s{^-(.+)}{_op_$1};
+        push @clauses, $self->$op( $k, $struct );
+    }
+
+    return join( ' AND ', @clauses );
+}
+
+sub _value_ARRAY {
+    my ( $self, $k, $v ) = @_;
+
+    return
+        '('
+        . join( ' OR ', map { $self->_value_SCALAR( $k, $_ ) } @$v ) . ')';
+}
+
+sub _op_default {
+    my ( $self, $v ) = @_;
+    return $self->_dispatch_value( '', $v );
 }
 
 sub _op_range {
-    my ( $self, $key ) = ( shift, shift );
-    my @vals = @{ shift() };
-    return $key, "[$vals[ 0 ] TO $vals[ 1 ]]";
+    my ( $self, $k ) = ( shift, shift );
+    my @v = @{ shift() };
+    return "$k:[$v[ 0 ] TO $v[ 1 ]]";
 }
 
 *_op_range_inc = \&_op_range;
 
 sub _op_range_exc {
-    my ( $self, $key ) = ( shift, shift );
-    my @vals = @{ shift() };
-    return $key, "{$vals[ 0 ] TO $vals[ 1 ]}";
+    my ( $self, $k ) = ( shift, shift );
+    my @v = @{ shift() };
+    return "$k:{$v[ 0 ] TO $v[ 1 ]}";
 }
 
 sub _op_boost {
-    my ( $self, $key ) = ( shift, shift );
-    my ( $val, $boost ) = @{ shift() };
-    $val = $self->escape( $val );
-    return $key, qq("$val"^$boost);
+    my ( $self, $k ) = ( shift, shift );
+    my ( $v, $boost ) = @{ shift() };
+    $v = $self->escape( $v );
+    return qq($k:"$v"^$boost);
 }
 
 sub _op_fuzzy {
-    my ( $self, $key ) = ( shift, shift );
-    my ( $val, $distance ) = @{ shift() };
-    $val = $self->escape( $val );
-    return $key, qq($val~$distance);
+    my ( $self, $k ) = ( shift, shift );
+    my ( $v, $distance ) = @{ shift() };
+    $v = $self->escape( $v );
+    return qq($k:$v~$distance);
 }
 
 sub _op_proximity {
-    my ( $self, $key ) = ( shift, shift );
-    my ( $val, $distance ) = @{ shift() };
-    $val = $self->escape( $val );
-    return $key, qq("$val"~$distance);
+    my ( $self, $k ) = ( shift, shift );
+    my ( $v, $distance ) = @{ shift() };
+    $v = $self->escape( $v );
+    return qq($k:"$v"~$distance);
 }
 
 sub _op_require {
-    my ( $self, $key, $value ) = @_;
-    return "+$key", '"' . $self->escape( $value ) . '"';
+    my ( $self, $k, $v ) = @_;
+    $v = $self->escape( $v );
+    return qq(+$k:"$v");
 }
 
 sub _op_prohibit {
-    my ( $self, $key, $value ) = @_;
-    return "-$key", '"' . $self->escape( $value ) . '"';
+    my ( $self, $k, $v ) = @_;
+    $v = $self->escape( $v );
+    return qq(-$k:"$v");
 }
 
 sub escape {

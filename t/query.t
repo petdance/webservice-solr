@@ -177,6 +177,14 @@ BEGIN {
     );
 }
 
+### nested and/or operators
+{   _check(
+        query => {
+            title => [ -and => { -require => 'star' }, { -require => 'wars' } ],
+        },
+        expect => q[(((+title:"star") AND (+title:"wars")))],
+    );
+}  
 sub _check {
     my %t = @_;
 

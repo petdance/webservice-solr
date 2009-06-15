@@ -184,6 +184,16 @@ BEGIN {
         },
         expect => q[(((+title:"star") AND (+title:"wars")))],
     );
+
+    _check(
+        query => {
+            title => [ -or => { -range_exc => [ 'a', 'c' ] }, 
+                              { -range_exc => [ 'e', 'k' ] } ],
+        },
+        expect => q[(((title:{a TO c}) OR (title:{e TO k}))],
+    );
+
+
 }  
 sub _check {
     my %t = @_;

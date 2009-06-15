@@ -267,6 +267,8 @@ __END__
 
 WebService::Solr::Query - Abstract query syntax for Solr queries
 
+=head1 QUERY SYNTAX
+
 =head1 ACCESSORS
 
 =over 4
@@ -294,6 +296,14 @@ The following values must be escaped in a search value:
 =head2 unescape( $value )
 
 Unescapes values escaped in C<escape()>.
+
+=head2 D
+
+Debugging constant, default: off.
+
+=head2 BUILDARGS
+
+Moose method to handle input to C<new()>.
 
 =head1 SEE ALSO
 

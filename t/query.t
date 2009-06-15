@@ -190,7 +190,7 @@ BEGIN {
             title => [ -or => { -range_exc => [ 'a', 'c' ] }, 
                               { -range_exc => [ 'e', 'k' ] } ],
         },
-        expect => q[(((title:{a TO c}) OR (title:{e TO k}))],
+        expect => q[(((title:{a TO c}) OR (title:{e TO k})))],
     );
 
 

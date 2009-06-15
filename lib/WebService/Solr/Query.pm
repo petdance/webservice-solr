@@ -277,21 +277,21 @@ WebService::Solr::Query - Abstract query syntax for Solr queries
 
 =head1 METHODS
 
-=head1 new( \%query )
+=head2 new( \%query )
 
 Creates a new query object with the given hashref.
 
-=head1 stringify( )
+=head2 stringify( )
 
 Converts the supplied structure into a Solr/Lucene query.
 
-=head1 escape( $value )
+=head2 escape( $value )
 
 The following values must be escaped in a search value:
 
     + - & | ! ( ) { } [ ] ^ " ~ * ? : \
 
-=head1 unescape( $value )
+=head2 unescape( $value )
 
 Unescapes values escaped in C<escape()>.
 

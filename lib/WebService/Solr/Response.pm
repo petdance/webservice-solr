@@ -28,7 +28,13 @@ sub _build_content {
     my $self = shift;
     my $content = $self->raw_response->content;
     return {} unless $content;
-    return JSON::XS::decode_json( $content );
+    my $rv = eval { JSON::XS::decode_json( $content ) };
+    
+    ### JSON::XS throw an exception, but kills most of the content
+    ### in the diagnostic, making it hard to track down the problem
+    die "Could not parse JSON response: $@ $content" if $@;
+    
+    return $rv;
 }
 
 sub _build_docs {

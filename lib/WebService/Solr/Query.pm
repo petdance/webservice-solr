@@ -267,7 +267,101 @@ __END__
 
 WebService::Solr::Query - Abstract query syntax for Solr queries
 
+=head1 SYNOPSIS
+
+    my $query  = WebService::Solr::Query->new( { foo => 'bar' } );
+    my $result = $solr->search( $query );
+
+=head1 DESCRIPTION
+
+WebService::Solr::Query provides a programmatic way to generate
+queries to be sent to Solr. Syntax wise, it attempts to be as close to 
+L<SQL::Abstract> WHERE clauses as possible, with obvious exceptions for 
+idioms that do not exist in SQL.
+
 =head1 QUERY SYNTAX
+
+=head2 Key-Value Pairs
+
+The simplest way to search is with key value pairs.
+
+    my $q = WebService::Solr::Query->new( { foo => 'bar' } );
+    # RESULT: (foo:"bar")
+
+=head2 Implicit AND and OR
+
+By default, data received as a HASHREF is AND'ed together.
+
+    my $q = WebService::Solr::Query->new( { foo => 'bar', baz => 'quux' } );
+    # RESULT: (foo:"bar" AND baz:"quux")
+
+Furthermore, data received as an ARRAYREF is OR'ed together.
+
+    my $q = WebService::Solr::Query->new( { foo => [ 'bar', 'baz' ] } );
+    # RESULT: (foo:"bar" OR foo:"baz")
+
+=head2 Nested AND and OR
+
+The ability to nest AND and OR boolean operators is essential to express
+complex queries. The C<-and> and C<-or> prefixes have been provided for this
+need.
+
+    my $q = WebService::Solr::Query->new( foo => [
+        -and => { -prohibit => 'bar' }, { -require => 'baz' }
+    ] );
+    # RESULT: (((-foo:"bar") AND (+foo:"baz")))
+    
+    my $q = WebService::Solr::Query->new( foo => [
+        -or => { -require => 'bar' }, { -prohibit => 'baz' }
+    ] );
+    # RESULT: (((+foo:"bar") OR (-foo:"baz")))
+
+=head2 Default Field
+
+To search the default field, use the C<-default> prefix.
+
+    my $q = WebService::Solr::Query->new( { -default => 'bar' } );
+    # RESULT: ("bar")
+
+=head2 Require/Prohibit
+
+    my $q = WebService::Solr::Query->new( foo => { -require => 'bar' } );
+    # RESULT: (+foo:"bar")
+    
+    my $q = WebService::Solr::Query->new( foo => { -prohibit => 'bar' } );
+    # RESULT: (-foo:"bar")
+
+=head2 Range
+
+There are two types of range queries, inclusive (C<-range_inc>) and 
+exclusive (C<-range_exc>). The C<-range> prefix can be used in place of
+C<-range_inc>.
+
+    my $q = WebService::Solr::Query->new( foo => { -range => ['a', 'z'] } );
+    # RESULT: (+foo:[a TO z])
+    
+    my $q = WebService::Solr::Query->new( foo => { -range_exc => ['a', 'z'] } );
+    # RESULT: (+foo:{a TO z})
+
+=head2 Boost
+
+    my $q = WebService::Solr::Query->new( foo => { -boost => [ 'bar', '2.0' ] } );
+    # RESULT: (foo:"bar"^2.0)
+
+=head2 Proximity
+
+    my $q = WebService::Solr::Query->new( foo => { -proximity => [ 'bar baz', 10 ] } );
+    # RESULT: (foo:"bar baz"~10)
+
+=head2 Fuzzy
+
+    my $q = WebService::Solr::Query->new( foo => { -fuzzy => [ 'bar', '0.8' ] } );
+    # RESULT: (foo:bar~0.8)
+
+=head2 Boost
+
+    my $q = WebService::Solr::Query->new( foo => { -boost => [ 'bar', '2.0' ] } );
+    # RESULT: (foo:"bar"^2.0)
 
 =head1 ACCESSORS
 
@@ -310,6 +404,8 @@ Moose method to handle input to C<new()>.
 =over 4
 
 =item * L<WebService::Solr>
+
+=item * http://wiki.apache.org/solr/SolrQuerySyntax
 
 =back
 

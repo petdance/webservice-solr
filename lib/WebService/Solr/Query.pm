@@ -413,6 +413,8 @@ Moose method to handle input to C<new()>.
 
 Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
+Jos Boumans E<lt>kane@cpan.orgE<gt>
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2008-2009 National Adult Literacy Database

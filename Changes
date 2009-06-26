@@ -1,5 +1,10 @@
 Revision history for Perl extension WebService::Solr.
 
+0.07  Fri Jun 26 2009
+    - Trap JSON::XS exceptions (Jos Boumans)
+    - Provide an abstract query generator: WebService::Solr::Query
+      (Jos Boumans, Brian Cassidy)
+
 0.06  Thu May 07 2009
     - Add auto_suggest to hit the new Solr 1.4 /autoSuggest API (RT #45798)
     - Refactor a basic GET request into its own public

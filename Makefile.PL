@@ -1,4 +1,4 @@
-use inc::Module::Install 0.87;
+use inc::Module::Install 0.91;
 
 if( -e 'MANIFEST.SKIP' ) {
     system( 'pod2text lib/WebService/Solr.pm > README' );

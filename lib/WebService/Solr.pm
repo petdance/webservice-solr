@@ -28,7 +28,7 @@ has 'default_params' => (
     default    => sub { { wt => 'json' } }
 );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub BUILDARGS {
     my ( $self, $url, $options ) = @_;

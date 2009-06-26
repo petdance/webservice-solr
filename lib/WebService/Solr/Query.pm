@@ -277,7 +277,9 @@ WebService::Solr::Query - Abstract query syntax for Solr queries
 WebService::Solr::Query provides a programmatic way to generate
 queries to be sent to Solr. Syntax wise, it attempts to be as close to 
 L<SQL::Abstract> WHERE clauses as possible, with obvious exceptions for 
-idioms that do not exist in SQL.
+idioms that do not exist in SQL. Just as values in SQL::Abstract are 
+SQL-escaped, this module does the appropriate Solr-escaping on all values 
+passed to the object (see C<escape()>).
 
 =head1 QUERY SYNTAX
 
@@ -386,6 +388,8 @@ Converts the supplied structure into a Solr/Lucene query.
 The following values must be escaped in a search value:
 
     + - & | ! ( ) { } [ ] ^ " ~ * ? : \
+
+B<NB:> Values sent to C<new()> are automatically escaped for you.
 
 =head2 unescape( $value )
 

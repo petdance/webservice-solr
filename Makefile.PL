@@ -25,3 +25,4 @@ tests_recursive;
 repository 'http://github.com/bricas/webservice-solr';
 
 WriteAll;
+

@@ -22,6 +22,9 @@ BEGIN {
         expect => '(("star trek" OR "star wars"))'
     );
 
+    # scalarref pass-through
+    _check( query => { '*' => \'*' }, expect => '(*:*)' );
+
     # field
     _check(
         query  => { title => 'Spaceballs' },

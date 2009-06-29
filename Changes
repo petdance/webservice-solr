@@ -1,5 +1,9 @@
 Revision history for Perl extension WebService::Solr.
 
+0.08  XXX
+    - Allow scalar ref value in WebService::Solr::Query, which works like
+      SQL::Abstract (literal query)
+
 0.07  Fri Jun 26 2009
     - Trap JSON::XS exceptions (Jos Boumans)
     - Provide an abstract query generator: WebService::Solr::Query

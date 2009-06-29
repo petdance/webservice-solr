@@ -134,9 +134,16 @@ sub _dispatch_value {
 }
 
 sub _value_SCALAR {
-    my ( $self, $k, $v ) = @_;    
-    $v = $self->escape( $v );
-    my $r = qq($k:"$v");
+    my ( $self, $k, $v ) = @_;
+
+    if( ref $v ) {
+        $v = $$v;
+    }
+    else {
+        $v = '"' . $self->escape( $v ) . '"';
+    }
+
+    my $r = qq($k:$v);
     $r =~ s{^:}{};
 
     D && $self->___log("Returning: $r");
@@ -308,14 +315,14 @@ The ability to nest AND and OR boolean operators is essential to express
 complex queries. The C<-and> and C<-or> prefixes have been provided for this
 need.
 
-    my $q = WebService::Solr::Query->new( foo => [
+    my $q = WebService::Solr::Query->new( { foo => [
         -and => { -prohibit => 'bar' }, { -require => 'baz' }
-    ] );
+    ] } );
     # RESULT: (((-foo:"bar") AND (+foo:"baz")))
     
-    my $q = WebService::Solr::Query->new( foo => [
+    my $q = WebService::Solr::Query->new( { foo => [
         -or => { -require => 'bar' }, { -prohibit => 'baz' }
-    ] );
+    ] } );
     # RESULT: (((+foo:"bar") OR (-foo:"baz")))
 
 =head2 Default Field
@@ -327,10 +334,10 @@ To search the default field, use the C<-default> prefix.
 
 =head2 Require/Prohibit
 
-    my $q = WebService::Solr::Query->new( foo => { -require => 'bar' } );
+    my $q = WebService::Solr::Query->new( { foo => { -require => 'bar' } } );
     # RESULT: (+foo:"bar")
     
-    my $q = WebService::Solr::Query->new( foo => { -prohibit => 'bar' } );
+    my $q = WebService::Solr::Query->new( { foo => { -prohibit => 'bar' } } );
     # RESULT: (-foo:"bar")
 
 =head2 Range
@@ -339,31 +346,41 @@ There are two types of range queries, inclusive (C<-range_inc>) and
 exclusive (C<-range_exc>). The C<-range> prefix can be used in place of
 C<-range_inc>.
 
-    my $q = WebService::Solr::Query->new( foo => { -range => ['a', 'z'] } );
+    my $q = WebService::Solr::Query->new( { foo => { -range => ['a', 'z'] } } );
     # RESULT: (+foo:[a TO z])
     
-    my $q = WebService::Solr::Query->new( foo => { -range_exc => ['a', 'z'] } );
+    my $q = WebService::Solr::Query->new( { foo => { -range_exc => ['a', 'z'] } } );
     # RESULT: (+foo:{a TO z})
 
 =head2 Boost
 
-    my $q = WebService::Solr::Query->new( foo => { -boost => [ 'bar', '2.0' ] } );
+    my $q = WebService::Solr::Query->new( { foo => { -boost => [ 'bar', '2.0' ] } } );
     # RESULT: (foo:"bar"^2.0)
 
 =head2 Proximity
 
-    my $q = WebService::Solr::Query->new( foo => { -proximity => [ 'bar baz', 10 ] } );
+    my $q = WebService::Solr::Query->new( { foo => { -proximity => [ 'bar baz', 10 ] } } );
     # RESULT: (foo:"bar baz"~10)
 
 =head2 Fuzzy
 
-    my $q = WebService::Solr::Query->new( foo => { -fuzzy => [ 'bar', '0.8' ] } );
+    my $q = WebService::Solr::Query->new( { foo => { -fuzzy => [ 'bar', '0.8' ] } } );
     # RESULT: (foo:bar~0.8)
 
 =head2 Boost
 
-    my $q = WebService::Solr::Query->new( foo => { -boost => [ 'bar', '2.0' ] } );
+    my $q = WebService::Solr::Query->new( { foo => { -boost => [ 'bar', '2.0' ] } } );
     # RESULT: (foo:"bar"^2.0)
+
+=head2 Literal Queries
+
+Specifying a scalar ref as a value in a key-value pair will allow arbitrary
+queries to be sent across the line. B<NB:> This will bypass any data
+massaging done on regular strings, thus the onus of properly escaping the
+data is left to the user.
+
+    my $q = WebService::Solr::Query->new( { '*' => \'*' } )
+    # RESULT (*:*)
 
 =head1 ACCESSORS
 

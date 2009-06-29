@@ -73,20 +73,23 @@ sub pageset {
     
     my $mode = $args{'mode'} || 'fixed';
     my $meth = "_pageset_". $mode;
+    my $pred = "_has".$meth;
     
-    return $self->$meth( @_ );
+    ### use a cached version if possilbe
+    return $self->$meth if $self->$pred;
+    
+    my $pager = $self->___build_pageset( @_ );
+    
+    ### store the result
+    return $self->$meth( $pager );
 }
 
-### 2 seperate entries so they're stored in an attribute, and we dont have to
-### rebuild them
-sub _build__pageset_slide { shift->___build_pageset( @_ ) }
-sub _build__pageset_fixed { shift->___build_pageset( @_ ) }
-
-sub _build_pageset {
+sub ___build_pageset {
     my $self    = shift;
     my $struct  = $self->content;
+
     return unless exists $struct->{ response }->{ numFound };
-    
+
     my $rows    = $struct->{ responseHeader }->{ params }->{ rows };
     my $pager   = Data::Pageset->new({
         total_entries    => $struct->{ response }->{ numFound },
@@ -96,6 +99,7 @@ sub _build_pageset {
         mode             => 'fixed', # default, or 'slide'
         @_,
     });
+
     return $pager;
 }
 

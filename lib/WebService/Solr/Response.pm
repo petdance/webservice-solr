@@ -10,7 +10,12 @@ use JSON::XS ();
 has 'raw_response' => (
     is      => 'ro',
     isa     => 'Object',
-    handles => [ qw( status_code status_message is_success is_error ) ]
+    handles =>  {
+        status_code    => 'code',
+        status_message => 'message',
+        is_success     => 'is_success',
+        is_error       => 'is_error'
+    },
 );
 
 has 'content' => ( is => 'rw', isa => 'HashRef', lazy_build => 1 );

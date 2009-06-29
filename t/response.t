@@ -30,8 +30,7 @@ my $Obj;
 ### check accessors
 {   ok( $Obj,                   "Testing accessors" );
     
-    ### XXX status_code and status_message do not seem to be handled.
-    for my $acc ( qw[is_success is_error content docs pager pageset] ) {
+    for my $acc ( qw[status_code status_message is_success is_error content docs pager pageset] ) {
         ok( $Obj->can( $acc ),  "   Obj->can( $acc )" );
         ok( defined $Obj->$acc, "       Value = " . $Obj->$acc );
     }        

@@ -12,6 +12,7 @@ all_from 'lib/WebService/Solr.pm';
 requires 'LWP::UserAgent';
 requires 'URI' => '1.28';
 requires 'Data::Page';
+requires 'Data::Pageset';
 requires 'XML::Generator' => '0.94';
 requires 'JSON::XS';
 requires 'Moose';

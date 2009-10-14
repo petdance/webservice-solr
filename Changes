@@ -1,6 +1,6 @@
 Revision history for Perl extension WebService::Solr.
 
-0.08  XXX
+0.08  Wed Oct 14 2009
     - Allow scalar ref value in WebService::Solr::Query, which works like
       SQL::Abstract (literal query)
     - Fix status_message and status_code in Response

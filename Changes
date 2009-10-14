@@ -5,6 +5,8 @@ Revision history for Perl extension WebService::Solr.
       SQL::Abstract (literal query)
     - Fix status_message and status_code in Response
     - Add Data::Pageset capabilities to Response (Jos Boumans)
+    - Ensure compatibility with older versions of Encode by making sure we
+      pass a string to encode() (Gert Brinkmann)
 
 0.07  Fri Jun 26 2009
     - Trap JSON::XS exceptions (Jos Boumans)

@@ -80,16 +80,16 @@ sub pageset {
     my $meth = "_pageset_". $mode;
     my $pred = "_has".$meth;
     
-    ### use a cached version if possilbe
+    ### use a cached version if possible
     return $self->$meth if $self->$pred;
     
-    my $pager = $self->___build_pageset( @_ );
+    my $pager = $self->_build_pageset( @_ );
     
     ### store the result
     return $self->$meth( $pager );
 }
 
-sub ___build_pageset {
+sub _build_pageset {
     my $self    = shift;
     my $struct  = $self->content;
 
@@ -194,7 +194,7 @@ Kirk Beers E<lt>kirk.beers@nald.caE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008 National Adult Literacy Database
+Copyright 2008-2009 National Adult Literacy Database
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

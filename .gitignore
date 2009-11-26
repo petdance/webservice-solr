@@ -9,3 +9,4 @@ MANIFEST*
 !MANIFEST.SKIP
 *~
 README
+*.tar.gz

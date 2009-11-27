@@ -23,10 +23,10 @@ has 'content' => ( is => 'rw', isa => 'HashRef', lazy_build => 1 );
 has 'docs' =>
     ( is => 'rw', isa => 'ArrayRef', auto_deref => 1, lazy_build => 1 );
 
-has 'pager' => ( is => 'rw', isa => 'Data::Page', lazy_build => 1 );
+has 'pager' => ( is => 'rw', isa => 'Maybe[Data::Page]', lazy_build => 1 );
 
-has '_pageset_slide' => ( is => 'rw', isa => 'Data::Pageset', lazy_build => 1 );
-has '_pageset_fixed' => ( is => 'rw', isa => 'Data::Pageset', lazy_build => 1 );
+has '_pageset_slide' => ( is => 'rw', isa => 'Maybe[Data::Pageset]', lazy_build => 1 );
+has '_pageset_fixed' => ( is => 'rw', isa => 'Maybe[Data::Pageset]', lazy_build => 1 );
 
 sub BUILDARGS {
     my ( $self, $res ) = @_;
@@ -61,14 +61,21 @@ sub _build_pager {
     my $struct = $self->content;
 
     return unless exists $struct->{ response }->{ numFound };
-    my $total = $struct->{ response }->{ numFound };
-    my $rows  = $struct->{ responseHeader }->{ params }->{ rows } || 10;
-    my $start = $struct->{ response }->{ start };
+
+    my $rows  = $struct->{ responseHeader }->{ params }->{ rows };
+
+    # do not generate a pager for queries explicitly requesting no rows
+    return if defined $rows && $rows == 0;
+
+    # rows not explicitly set, find default from rows returned
+    if( !defined $rows ) {
+        $rows = scalar @{ $struct->{ response }->{ docs } };
+    }
 
     my $pager = Data::Page->new;
-    $pager->total_entries( $total );
+    $pager->total_entries( $struct->{ response }->{ numFound } );
     $pager->entries_per_page( $rows );
-    $pager->current_page( $start / $rows + 1 );
+    $pager->current_page( $struct->{ response }->{ start } / $rows + 1 );
     return $pager;
 }
 
@@ -95,15 +102,24 @@ sub _build_pageset {
 
     return unless exists $struct->{ response }->{ numFound };
 
-    my $rows    = $struct->{ responseHeader }->{ params }->{ rows };
-    my $pager   = Data::Pageset->new({
+    my $rows  = $struct->{ responseHeader }->{ params }->{ rows };
+
+    # do not generate a pager for queries explicitly requesting no rows
+    return if defined $rows && $rows == 0;
+
+    # rows not explicitly set, find default from rows returned
+    if( !defined $rows ) {
+        $rows = scalar @{ $struct->{ response }->{ docs } };
+    }
+
+    my $pager   = Data::Pageset->new( {
         total_entries    => $struct->{ response }->{ numFound },
-        entries_per_page => $rows || 10,
-        current_page     => do { $struct->{ response }->{ start } / $rows + 1 },
+        entries_per_page => $rows,
+        current_page     => $struct->{ response }->{ start } / $rows + 1,
         pages_per_set    => 10,
         mode             => 'fixed', # default, or 'slide'
         @_,
-    });
+    } );
 
     return $pager;
 }

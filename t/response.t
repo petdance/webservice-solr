@@ -59,3 +59,16 @@ my $Obj;
         is( $pager->current_page, 3,"   Current page = 2" );
     }
 }
+
+### special case: 0 rows
+{
+    my $http_response = HTTP::Response->new(
+        200 => 'OK',
+        HTTP::Headers->new,
+        q[{"responseHeader":{"status":0,"QTime":1,"params":{"facet.mincount":"1","q":"*:*","facet.field":"tags","wt":"json","rows":"0"}},"response":{"numFound":220,"start":0,"docs":[]}}],
+    );
+
+    my $solr_response = $Class->new( $http_response );
+    ok( !defined $solr_response->pager, '0 rows, undef pager' );
+    ok( !defined $solr_response->pageset, '0 rows, undef pageset' );
+}

@@ -10,7 +10,7 @@ use JSON::XS ();
 has 'raw_response' => (
     is      => 'ro',
     isa     => 'Object',
-    handles =>  {
+    handles => {
         status_code    => 'code',
         status_message => 'message',
         is_success     => 'is_success',
@@ -25,8 +25,10 @@ has 'docs' =>
 
 has 'pager' => ( is => 'rw', isa => 'Maybe[Data::Page]', lazy_build => 1 );
 
-has '_pageset_slide' => ( is => 'rw', isa => 'Maybe[Data::Pageset]', lazy_build => 1 );
-has '_pageset_fixed' => ( is => 'rw', isa => 'Maybe[Data::Pageset]', lazy_build => 1 );
+has '_pageset_slide' =>
+    ( is => 'rw', isa => 'Maybe[Data::Pageset]', lazy_build => 1 );
+has '_pageset_fixed' =>
+    ( is => 'rw', isa => 'Maybe[Data::Pageset]', lazy_build => 1 );
 
 sub BUILDARGS {
     my ( $self, $res ) = @_;
@@ -34,15 +36,15 @@ sub BUILDARGS {
 }
 
 sub _build_content {
-    my $self = shift;
+    my $self    = shift;
     my $content = $self->raw_response->content;
     return {} unless $content;
     my $rv = eval { JSON::XS::decode_json( $content ) };
-    
+
     ### JSON::XS throw an exception, but kills most of the content
     ### in the diagnostic, making it hard to track down the problem
     die "Could not parse JSON response: $@ $content" if $@;
-    
+
     return $rv;
 }
 
@@ -62,13 +64,13 @@ sub _build_pager {
 
     return unless exists $struct->{ response }->{ numFound };
 
-    my $rows  = $struct->{ responseHeader }->{ params }->{ rows };
+    my $rows = $struct->{ responseHeader }->{ params }->{ rows };
 
     # do not generate a pager for queries explicitly requesting no rows
     return if defined $rows && $rows == 0;
 
     # rows not explicitly set, find default from rows returned
-    if( !defined $rows ) {
+    if ( !defined $rows ) {
         $rows = scalar @{ $struct->{ response }->{ docs } };
     }
 
@@ -82,50 +84,51 @@ sub _build_pager {
 sub pageset {
     my $self = shift;
     my %args = @_;
-    
-    my $mode = $args{'mode'} || 'fixed';
-    my $meth = "_pageset_". $mode;
-    my $pred = "_has".$meth;
-    
+
+    my $mode = $args{ 'mode' } || 'fixed';
+    my $meth = "_pageset_" . $mode;
+    my $pred = "_has" . $meth;
+
     ### use a cached version if possible
     return $self->$meth if $self->$pred;
-    
+
     my $pager = $self->_build_pageset( @_ );
-    
+
     ### store the result
     return $self->$meth( $pager );
 }
 
 sub _build_pageset {
-    my $self    = shift;
-    my $struct  = $self->content;
+    my $self   = shift;
+    my $struct = $self->content;
 
     return unless exists $struct->{ response }->{ numFound };
 
-    my $rows  = $struct->{ responseHeader }->{ params }->{ rows };
+    my $rows = $struct->{ responseHeader }->{ params }->{ rows };
 
     # do not generate a pager for queries explicitly requesting no rows
     return if defined $rows && $rows == 0;
 
     # rows not explicitly set, find default from rows returned
-    if( !defined $rows ) {
+    if ( !defined $rows ) {
         $rows = scalar @{ $struct->{ response }->{ docs } };
     }
 
-    my $pager   = Data::Pageset->new( {
-        total_entries    => $struct->{ response }->{ numFound },
-        entries_per_page => $rows,
-        current_page     => $struct->{ response }->{ start } / $rows + 1,
-        pages_per_set    => 10,
-        mode             => 'fixed', # default, or 'slide'
-        @_,
-    } );
+    my $pager = Data::Pageset->new(
+        {   total_entries    => $struct->{ response }->{ numFound },
+            entries_per_page => $rows,
+            current_page     => $struct->{ response }->{ start } / $rows + 1,
+            pages_per_set    => 10,
+            mode => 'fixed',    # default, or 'slide'
+            @_,
+        }
+    );
 
     return $pager;
 }
 
 sub facet_counts {
-    return  shift->content->{ facet_counts };
+    return shift->content->{ facet_counts };
 }
 
 sub solr_status {

@@ -31,7 +31,9 @@ has 'default_params' => (
 has '_xml_generator' => (
     is       => 'ro',
     init_arg => undef,
-    default  => sub { XML::Generator->new( ':std', escape => 'always,even-entities' ) },
+    default  => sub {
+        XML::Generator->new( ':std', escape => 'always,even-entities' );
+    },
 );
 
 our $VERSION = '0.09';
@@ -44,11 +46,9 @@ sub BUILDARGS {
         $options->{ url } = ref $url ? $url : URI->new( $url );
     }
 
-    if( exists $options->{ default_params } ) {
-        $options->{ default_params } = {
-            %{ $options->{ default_params } },
-            wt => 'json',
-        }
+    if ( exists $options->{ default_params } ) {
+        $options->{ default_params }
+            = { %{ $options->{ default_params } }, wt => 'json', };
     }
 
     return $options;
@@ -81,7 +81,9 @@ sub update {
 sub commit {
     my ( $self, $params ) = @_;
     $params ||= {};
-    my $response = $self->_send_update( $self->_xml_generator->commit( $params ), {}, 0 );
+    my $response
+        = $self->_send_update( $self->_xml_generator->commit( $params ), {},
+        0 );
     return $response->ok;
 }
 
@@ -100,7 +102,7 @@ sub optimize {
 }
 
 sub delete {
-    my( $self, $options ) = @_;
+    my ( $self, $options ) = @_;
     my $gen = $self->_xml_generator;
 
     my $xml = '';
@@ -109,8 +111,7 @@ sub delete {
         $xml .= $gen->$k( $_ ) for ref $v ? @$v : $v;
     }
 
-    my $response
-        = $self->_send_update( "<delete>${xml}</delete>" );
+    my $response = $self->_send_update( "<delete>${xml}</delete>" );
     return $response->ok;
 }
 
@@ -132,8 +133,7 @@ sub ping {
     my ( $self ) = @_;
     my $response = WebService::Solr::Response->new(
         $self->agent->get( $self->_gen_url( 'admin/ping' ) ) );
-    return
-        exists $response->content->{ status }
+    return exists $response->content->{ status }
         && $response->content->{ status } eq 'OK';
 }
 
@@ -174,15 +174,15 @@ sub _send_update {
     my $req = HTTP::Request->new(
         POST => $url,
         HTTP::Headers->new( Content_Type => 'text/xml; charset=utf-8' ),
-        '<?xml version="1.0" encoding="UTF-8"?>' . encode('utf8', "$xml")
+        '<?xml version="1.0" encoding="UTF-8"?>' . encode( 'utf8', "$xml" )
     );
 
-    my $http_response = $self->agent->request($req);
+    my $http_response = $self->agent->request( $req );
     if ( $http_response->is_error ) {
         confess $http_response->status_line . ': ' . $http_response->content;
     }
 
-    my $res = WebService::Solr::Response->new($http_response);
+    my $res = WebService::Solr::Response->new( $http_response );
 
     $self->commit if $autocommit;
 
@@ -326,7 +326,7 @@ This method will rollback any additions/deletions since the last commit.
 
 Sends an optimize command. Returns true on success, false otherwise.
 
-Options as of Solr 1.3 are the same as C<commit()>.
+Options as of Solr 1.4 are the same as C<commit()>.
 
 =head2 ping( )
 

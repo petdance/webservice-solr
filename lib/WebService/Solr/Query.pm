@@ -32,7 +32,7 @@ sub _dispatch_struct {
 
     my $method = '_struct_' . ref $struct;
 
-    D && $self->___log( "Dispatching to ->$method ". Dumper $struct );
+    D && $self->___log( "Dispatching to ->$method " . Dumper $struct );
 
     my $rv = $self->$method( $struct );
 
@@ -49,23 +49,25 @@ sub _struct_HASH {
     for my $k ( keys %$struct ) {
         my $v = $struct->{ $k };
 
-        D && $self->___log("Key => $k, value => ". Dumper($v));
+        D && $self->___log( "Key => $k, value => " . Dumper( $v ) );
 
         if ( $k =~ m{^-(.+)} ) {
             my $method = "_op_$1";
 
-            D && $self->___log("Dispatch ->$method ". Dumper($v));
+            D && $self->___log( "Dispatch ->$method " . Dumper( $v ) );
             push @clauses, $self->$method( $v );
         }
         else {
-            D && $self->___log("Dispatch ->_dispatch_value $k, ". Dumper($v));
+            D
+                && $self->___log(
+                "Dispatch ->_dispatch_value $k, " . Dumper( $v ) );
             push @clauses, $self->_dispatch_value( $k, $v );
         }
     }
 
     my $rv = join( ' AND ', @clauses );
 
-    D && $self->___log("Returning: $rv");
+    D && $self->___log( "Returning: $rv" );
 
     return $rv;
 }
@@ -73,13 +75,13 @@ sub _struct_HASH {
 sub _struct_ARRAY {
     my ( $self, $struct ) = @_;
 
-    my $rv = 
-          '('
+    my $rv
+        = '('
         . join( " OR ", map { $self->_dispatch_struct( $_ ) } @$struct )
         . ')';
-        
-    D && $self->___log("Returning: $rv");
-    
+
+    D && $self->___log( "Returning: $rv" );
+
     return $rv;
 }
 
@@ -92,51 +94,58 @@ sub _dispatch_value {
     # [ '-and',
     #   { '-require' => 'star' },
     #   { '-require' => 'wars' }
-    # ];    
-    if( ref $v and UNIVERSAL::isa( $v, 'ARRAY' ) and
-        defined $v->[0] and $v->[0] =~ /^ - ( AND|OR ) $/ix
-    ) {
+    # ];
+    if (    ref $v
+        and UNIVERSAL::isa( $v, 'ARRAY' )
+        and defined $v->[ 0 ]
+        and $v->[ 0 ] =~ /^ - ( AND|OR ) $/ix )
+    {
         ### XXX we're assuming that all the next statements MUST
         ### be hashrefs. is this correct?
         shift @$v;
         my $op = uc $1;
 
-        D && $self->___log("Special operator detected: $op ". Dumper($v));
+        D
+            && $self->___log(
+            "Special operator detected: $op " . Dumper( $v ) );
 
         my @clauses;
         for my $href ( @$v ) {
-            D && $self->___log( 
-                "Dispatch ->_dispatch_struct({ $k, ". Dumper($href) .'})' );
+            D
+                && $self->___log( "Dispatch ->_dispatch_struct({ $k, "
+                    . Dumper( $href )
+                    . '})' );
 
-            ### the individual directive ($href) pertains to the key, 
+            ### the individual directive ($href) pertains to the key,
             ### so we should send that along.
             my $part = $self->_dispatch_struct( { $k => $href } );
-            
+
             D && $self->___log( "Returned $part" );
 
-            push @clauses, '('. $part .')';
+            push @clauses, '(' . $part . ')';
         }
-        
-        $rv = '('. join( " $op ", @clauses ) .')';
 
-    ### nothing special about this combo, so do a usual dispatch
-    } else {        
+        $rv = '(' . join( " $op ", @clauses ) . ')';
+
+        ### nothing special about this combo, so do a usual dispatch
+    }
+    else {
         my $method = '_value_' . ( ref $v || 'SCALAR' );
-        
-        D && $self->___log("Dispatch ->$method $k, ". Dumper($v));
-        
+
+        D && $self->___log( "Dispatch ->$method $k, " . Dumper( $v ) );
+
         $rv = $self->$method( $k, $v );
     }
-    
-    D && $self->___log("Returning: $rv");
-    
+
+    D && $self->___log( "Returning: $rv" );
+
     return $rv;
 }
 
 sub _value_SCALAR {
     my ( $self, $k, $v ) = @_;
 
-    if( ref $v ) {
+    if ( ref $v ) {
         $v = $$v;
     }
     else {
@@ -146,7 +155,7 @@ sub _value_SCALAR {
     my $r = qq($k:$v);
     $r =~ s{^:}{};
 
-    D && $self->___log("Returning: $r");
+    D && $self->___log( "Returning: $r" );
 
     return $r;
 }
@@ -159,15 +168,15 @@ sub _value_HASH {
     for my $op ( keys %$v ) {
         my $struct = $v->{ $op };
         $op =~ s{^-(.+)}{_op_$1};
-        
-        D && $self->___log("Dispatch ->$op $k, ". Dumper($v));
-        
+
+        D && $self->___log( "Dispatch ->$op $k, " . Dumper( $v ) );
+
         push @clauses, $self->$op( $k, $struct );
     }
 
     my $rv = join( ' AND ', @clauses );
 
-    D && $self->___log("Returning: $rv");
+    D && $self->___log( "Returning: $rv" );
 
     return $rv;
 }
@@ -175,12 +184,11 @@ sub _value_HASH {
 sub _value_ARRAY {
     my ( $self, $k, $v ) = @_;
 
-    my $rv = 
-        '('
+    my $rv = '('
         . join( ' OR ', map { $self->_value_SCALAR( $k, $_ ) } @$v ) . ')';
 
-    D && $self->___log("Returning: $rv");
-    
+    D && $self->___log( "Returning: $rv" );
+
     return $rv;
 }
 
@@ -254,11 +262,11 @@ sub ___log {
 
     ### subroutine the log call came from, and line number the log
     ### call came from. that's 2 different caller frames :(
-    my $who  = join ':', [caller(1)]->[3], [caller(0)]->[2];
-    
+    my $who = join ':', [ caller( 1 ) ]->[ 3 ], [ caller( 0 ) ]->[ 2 ];
+
     ### make sure we prefix every line with a #
     $msg =~ s/\n/\n#/g;
-    
+
     print "# $who: $msg\n";
 }
 

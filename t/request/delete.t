@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 18;
 use Test::Mock::LWP;
 
 use XML::Simple;
@@ -29,6 +29,16 @@ my $expect;
 {
     $expect = { query => 'name:DDR' };
     $solr->delete_by_query( 'name:DDR' );
+}
+
+{
+    $expect = { query => 'foo', id => 13 };
+    $solr->delete( $expect );
+}
+
+{
+    $expect = { query => [ qw( foo bar ) ], id => [ 13, 42 ] };
+    $solr->delete( $expect );
 }
 
 sub _test_req {

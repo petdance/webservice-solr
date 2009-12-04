@@ -82,6 +82,12 @@ sub commit {
     return $response->ok;
 }
 
+sub rollback {
+    my ( $self ) = @_;
+    my $response = $self->_send_update( '<rollback/>', {}, 0 );
+    return $response->ok;
+}
+
 sub optimize {
     my ( $self, $params ) = @_;
     $params ||= {};
@@ -276,6 +282,10 @@ Options as of Solr 1.3 include:
 =item * waitSearcher (default: true)
 
 =back
+
+=head2 rollback( )
+
+This method will rollback any additions/deletions since the last commit.
 
 =head2 optimize( \%options )
 

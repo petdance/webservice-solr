@@ -1,11 +1,12 @@
 Revision history for Perl extension WebService::Solr.
 
-0.09  XXX
+0.09  Fri Dec 04 2009
     - Return undef in pager/pageset special case when we explicitly
       return 0 rows
     - Add rollback() from Solr 1.4
     - Add generic delete() from Solr 1.4
     - Update docs to match Solr 1.4 options
+    - Fix ping() to check only the HTTP status
 
 0.08  Wed Oct 14 2009
     - Allow scalar ref value in WebService::Solr::Query, which works like

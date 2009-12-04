@@ -133,8 +133,7 @@ sub ping {
     my ( $self ) = @_;
     my $response = WebService::Solr::Response->new(
         $self->agent->get( $self->_gen_url( 'admin/ping' ) ) );
-    return exists $response->content->{ status }
-        && $response->content->{ status } eq 'OK';
+    return $response->is_success;
 }
 
 sub search {

@@ -131,6 +131,10 @@ sub facet_counts {
     return shift->content->{ facet_counts };
 }
 
+sub spellcheck {
+    return shift->content->{ spellcheck };
+}
+
 sub solr_status {
     return shift->content->{ responseHeader }->{ status };
 }
@@ -196,6 +200,10 @@ A Moose override to allow our custom constructor.
 =head2 facet_counts( )
 
 A shortcut to the C<facet_counts> key in the response data.
+
+=head2 spellcheck( )
+
+A shortcut to the C<spellcheck> key in the response data.
 
 =head2 solr_status( )
 

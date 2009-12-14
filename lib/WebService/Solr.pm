@@ -36,7 +36,7 @@ has '_xml_generator' => (
     },
 );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub BUILDARGS {
     my ( $self, $url, $options ) = @_;

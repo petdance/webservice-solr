@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService::Solr.
 
+0.10  XXX
+    - Add spellcheck() convenience method to Response object
+
 0.09  Fri Dec 04 2009
     - Return undef in pager/pageset special case when we explicitly
       return 0 rows

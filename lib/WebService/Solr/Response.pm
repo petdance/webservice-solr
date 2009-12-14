@@ -66,13 +66,13 @@ sub _build_pager {
 
     my $rows = $struct->{ responseHeader }->{ params }->{ rows };
 
-    # do not generate a pager for queries explicitly requesting no rows
-    return if defined $rows && $rows == 0;
-
     # rows not explicitly set, find default from rows returned
     if ( !defined $rows ) {
         $rows = scalar @{ $struct->{ response }->{ docs } };
     }
+
+    # do not generate a pager for queries explicitly requesting no rows
+    return if defined $rows && $rows == 0;
 
     my $pager = Data::Page->new;
     $pager->total_entries( $struct->{ response }->{ numFound } );

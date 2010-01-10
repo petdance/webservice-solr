@@ -181,23 +181,27 @@ BEGIN {
 }
 
 ### nested and/or operators
-{   _check(
+{
+    _check(
         query => {
-            title => [ -and => { -require => 'star' }, { -require => 'wars' } ],
+            title =>
+                [ -and => { -require => 'star' }, { -require => 'wars' } ],
         },
         expect => q[(((+title:"star") AND (+title:"wars")))],
     );
 
     _check(
         query => {
-            title => [ -or => { -range_exc => [ 'a', 'c' ] }, 
-                              { -range_exc => [ 'e', 'k' ] } ],
+            title => [
+                -or => { -range_exc => [ 'a', 'c' ] },
+                { -range_exc => [ 'e', 'k' ] }
+            ],
         },
         expect => q[(((title:{a TO c}) OR (title:{e TO k})))],
     );
 
+}
 
-}  
 sub _check {
     my %t = @_;
 

@@ -39,8 +39,7 @@ sub _test_req {
         { wt => 'json' },
         'optimize() params'
     );
-    is(
-        $_[ 3 ]->header( 'Content_Type' ),
+    is( $_[ 3 ]->header( 'Content_Type' ),
         'text/xml; charset=utf-8',
         'optimize() headers'
     );

@@ -22,8 +22,7 @@ $solr->rollback;
 
 sub _test_req {
     is( $_[ 2 ]->path, '/solr/update', 'rollback() path' );
-    is(
-        $_[ 3 ]->header( 'Content_Type' ),
+    is( $_[ 3 ]->header( 'Content_Type' ),
         'text/xml; charset=utf-8',
         'rollback() headers'
     );

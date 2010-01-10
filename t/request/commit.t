@@ -35,8 +35,7 @@ for (
 sub _test_req {
     is( $_[ 2 ]->path, '/solr/update', 'commit() path' );
     is_deeply( { $_[ 2 ]->query_form }, { wt => 'json' }, 'commit() params' );
-    is(
-        $_[ 3 ]->header( 'Content_Type' ),
+    is( $_[ 3 ]->header( 'Content_Type' ),
         'text/xml; charset=utf-8',
         'commit() headers'
     );

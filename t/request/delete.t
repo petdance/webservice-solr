@@ -44,8 +44,7 @@ my $expect;
 sub _test_req {
     is( $_[ 2 ]->path, '/solr/update', 'delete() path' );
     is_deeply( { $_[ 2 ]->query_form }, { wt => 'json' }, 'delete() params' );
-    is(
-        $_[ 3 ]->header( 'Content_Type' ),
+    is( $_[ 3 ]->header( 'Content_Type' ),
         'text/xml; charset=utf-8',
         'delete() headers'
     );

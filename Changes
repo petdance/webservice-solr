@@ -1,6 +1,6 @@
 Revision history for Perl extension WebService::Solr.
 
-0.10  XXX
+0.10  Wed Mar 17 2010
     - Add spellcheck() convenience method to Response object
     - Fix exception when response contained no documents
 

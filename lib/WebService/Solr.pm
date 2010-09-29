@@ -36,7 +36,7 @@ has '_xml_generator' => (
     },
 );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub BUILDARGS {
     my ( $self, $url, $options ) = @_;
@@ -228,6 +228,18 @@ enterprise-grade indexing and searching platform.
 =item * default_params - a hashref of parameters to send on every request
 
 =back
+
+=head1 HTTP KEEP-ALIVE
+
+Enabling HTTP Keep-Alive is as simple as passing your custom user-agent to the
+constructor.
+
+    my $solr = WebService::Solr->new( $url,
+        { agent => LWP::UserAgent->new( keep_alive => 1 ) }
+    );
+
+Visit L<LWP::UserAgent>'s documentation for more information and available
+options.
 
 =head1 METHODS
 

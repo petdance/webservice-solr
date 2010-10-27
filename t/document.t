@@ -1,4 +1,4 @@
-use Test::More tests => 22;
+use Test::More tests => 23;
 
 use strict;
 use warnings;
@@ -120,4 +120,9 @@ my @field_objs = map { WebService::Solr::Field->new( @$_ ) } @fields;
     my $doc = WebService::Solr::Document->new( x => [ 1, 2, 3 ] );
     isa_ok( $doc, 'WebService::Solr::Document' );
     is( scalar @{ $doc->fields }, 3, 'arrayref of values to fields' );
+}
+
+{
+    my $doc = WebService::Solr::Document->new( @fields[ 0 .. 4 ] );
+    is_deeply([ sort($doc->field_names) ], [ qw(id manu name sku weight)], 'field_names');
 }

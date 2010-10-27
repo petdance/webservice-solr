@@ -2,6 +2,7 @@ Revision history for Perl extension WebService::Solr.
 
 0.11  TO BE RELEASED
     - Add a note about enabling Keep-Alive connections (Stijn Prompers)
+    - Add field_named method to Document (Cory Watson, Craig Hall)
 
 0.10  Wed Mar 17 2010
     - Add spellcheck() convenience method to Response object

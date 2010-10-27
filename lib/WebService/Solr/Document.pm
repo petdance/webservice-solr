@@ -49,6 +49,12 @@ sub _parse_fields {
     return @new_fields;
 }
 
+sub field_names {
+    my ( $self ) = @_;
+    my %names = map { $_->name => 1 } $self->fields;
+    return keys %names;
+}
+
 sub value_for {
     my @values = shift->values_for( shift );
     return $values[ 0 ];
@@ -117,6 +123,10 @@ A Moose override to allow our custom constructor.
 =head2 add_fields( @fields|\@fields )
 
 Adds C<@fields> to the document.
+
+=head2 field_names
+
+Returns a list of field names that are in this document.
 
 =head2 value_for( $name )
 

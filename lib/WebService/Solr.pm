@@ -36,7 +36,7 @@ has '_xml_generator' => (
     },
 );
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub BUILDARGS {
     my ( $self, $url, $options ) = @_;
@@ -223,7 +223,7 @@ enterprise-grade indexing and searching platform.
 
 =item * agent - a user agent object
 
-=item * autocommit - a boolean value for automatic commit() after add/update/delete
+=item * autocommit - a boolean value for automatic commit() after add/update/delete (default: enabled)
 
 =item * default_params - a hashref of parameters to send on every request
 
@@ -308,10 +308,10 @@ more details about the available options (http://wiki.apache.org/solr/TermsCompo
 =head2 commit( \%options )
 
 Sends a commit command. Returns true on success, false otherwise. You must do
-a commit after an add, update or delete. You can turn autocommit on to have
-the library do it for you:
+a commit after an add, update or delete. By default, autocommit is enabled. 
+You may disable autocommit to allow you to issue commit commands manually:
 
-    my $solr = WebService::Solr->new( undef, { autocommit => 1 } );
+    my $solr = WebService::Solr->new( undef, { autocommit => 0 } );
     $solr->add( $doc ); # will not automatically call commit()
     $solr->commit;
 
@@ -364,11 +364,11 @@ own correspodingly named function (e.g. C<dataimport> ).
 
 Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
-Kirk Beers E<lt>kirk.beers@nald.caE<gt>
+Kirk Beers
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2010 National Adult Literacy Database
+Copyright 2008-2011 National Adult Literacy Database
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

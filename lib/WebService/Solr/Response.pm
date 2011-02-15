@@ -217,11 +217,11 @@ Calls C<solr_status()> and check that it is equal to 0.
 
 Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
-Kirk Beers E<lt>kirk.beers@nald.caE<gt>
+Kirk Beers
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2010 National Adult Literacy Database
+Copyright 2008-2011 National Adult Literacy Database
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

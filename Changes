@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService::Solr.
 
+0.12  TO BE RELEASED
+    - Clean up docs in relation to autocommit
+
 0.11  Wed Oct 27 2010
     - Add a note about enabling Keep-Alive connections (Stijn Prompers)
     - Add field_names method to Document (Cory Watson, Craig Hall)

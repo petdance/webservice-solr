@@ -1,4 +1,4 @@
-use Test::More tests => 23;
+use Test::More tests => 25;
 
 use strict;
 use warnings;
@@ -7,6 +7,8 @@ BEGIN {
     use_ok( 'WebService::Solr::Document' );
     use_ok( 'WebService::Solr::Field' );
 }
+
+use JSON::XS;
 
 my @fields = (
     [ id     => 1,               { boost => 1.6 } ],
@@ -125,4 +127,12 @@ my @field_objs = map { WebService::Solr::Field->new( @$_ ) } @fields;
 {
     my $doc = WebService::Solr::Document->new( @fields[ 0 .. 4 ] );
     is_deeply([ sort($doc->field_names) ], [ qw(id manu name sku weight)], 'field_names');
+}
+
+{
+    my $doc = WebService::Solr::Document->new(
+        bools => decode_json(q/{"arr": [true,false,true]}/)->{arr}
+    );
+    isa_ok( $doc, 'WebService::Solr::Document' );
+    is_deeply([1,0,1], [$doc->values_for('bools')], 'boolean arrays');
 }

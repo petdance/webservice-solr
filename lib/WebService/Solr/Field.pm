@@ -1,32 +1,34 @@
 package WebService::Solr::Field;
 
-use Moose;
-
-has 'name' => ( is => 'rw', isa => 'Str' );
-
-has 'value' => ( is => 'rw', isa => 'Str' );
-
-has 'boost' => ( is => 'rw', isa => 'Maybe[Num]' );
-
 use XML::Easy::Element;
 use XML::Easy::Content;
 use XML::Easy::Text qw(xml10_write_element);
 
-sub BUILDARGS {
+sub new {
     my ( $self, $name, $value, $opts ) = @_;
     $opts ||= {};
 
-    return { name => $name, value => $value, %$opts };
+    die "name required" unless defined $name;
+    die "value required" unless defined $value;
+
+    $self = {
+        name  => $name,
+        value => $value,
+        %{$opts},
+    };
+    bless $self;
+
+    return $self;
 }
 
 sub to_element {
     my $self = shift;
-    my %attr = ( $self->boost ? ( boost => $self->boost ) : () );
+    my %attr = ( $self->{boost} ? ( boost => $self->{boost} ) : () );
 
     return XML::Easy::Element->new(
         'field',
-        { name => $self->name, %attr },
-        XML::Easy::Content->new( [ $self->value ] ),
+        { name => $self->{name}, %attr },
+        XML::Easy::Content->new( [ $self->{value} ] ),
     );
 }
 
@@ -35,10 +37,6 @@ sub to_xml {
 
     return xml10_write_element($self->to_element);
 }
-
-no Moose;
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 

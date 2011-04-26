@@ -1,31 +1,25 @@
 package WebService::Solr::Document;
 
-use Moose;
-
 use WebService::Solr::Field;
 
 use XML::Easy::Element;
 use XML::Easy::Content;
 use XML::Easy::Text qw(xml10_write_element);
 
-has 'fields' => (
-    is         => 'rw',
-    isa        => 'ArrayRef[Object]',
-    default    => sub { [] },
-    auto_deref => 1
-);
-
-has 'boost' => ( is => 'rw', isa => 'Maybe[Num]' );
-
-sub BUILDARGS {
+sub new {
     my ( $class, @fields ) = @_;
 
-    return { fields => [ _parse_fields( @fields ) ] };
+    my %self;
+    $self{fields} = [ _parse_fields( @fields ) ];
+
+    bless \%self;
+
+    return \%self;
 }
 
 sub add_fields {
     my ( $self, @fields ) = @_;
-    $self->fields( [ $self->fields, _parse_fields( @fields ) ] );
+    $self->{fields} = [ @{$self->{fields}}, _parse_fields( @fields ) ];
 }
 
 sub _parse_fields {
@@ -34,7 +28,7 @@ sub _parse_fields {
 
     # handle field objects, array refs and normal k => v pairs
     while ( my $f = shift @fields ) {
-        if ( blessed $f ) {
+        if ( ref $f eq 'WebService::Solr::Field' ) {
             push @new_fields, $f;
             next;
         }
@@ -44,7 +38,7 @@ sub _parse_fields {
         }
 
         my $v = shift @fields;
-        my @values = ( ref $v and !blessed $v ) ? @$v : $v;
+        my @values = ( ref $v and ref $v ne 'WebService::Solr::Field' ) ? @$v : $v;
         push @new_fields,
             map { WebService::Solr::Field->new( $f => "$_" ) } @values;
     }
@@ -54,7 +48,7 @@ sub _parse_fields {
 
 sub field_names {
     my ( $self ) = @_;
-    my %names = map { $_->name => 1 } $self->fields;
+    my %names = map { $_->{name} => 1 } @{$self->{fields}};
     return keys %names;
 }
 
@@ -65,14 +59,14 @@ sub value_for {
 
 sub values_for {
     my ( $self, $key ) = @_;
-    return map { $_->value } grep { $_->name eq $key } $self->fields;
+    return map { $_->{value} } grep { $_->{name} eq $key } @{$self->{fields}};
 }
 
 sub to_element {
     my $self = shift;
-    my %attr = ( $self->boost ? ( boost => $self->boost ) : () );
+    my %attr = ( $self->{boost} ? ( boost => $self->{boost} ) : () );
 
-    my @elements = map { +'' => $_->to_element } $self->fields;
+    my @elements = map { +'' => $_->to_element } @{$self->{fields}};
 
     return XML::Easy::Element->new(
         'doc',
@@ -86,10 +80,6 @@ sub to_xml {
 
     return xml10_write_element($self->to_element);
 }
-
-no Moose;
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 

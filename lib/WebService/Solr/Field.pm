@@ -1,33 +1,32 @@
 package WebService::Solr::Field;
 
-use Moose;
-
-has 'name' => ( is => 'rw', isa => 'Str' );
-
-has 'value' => ( is => 'rw', isa => 'Str' );
-
-has 'boost' => ( is => 'rw', isa => 'Maybe[Num]' );
-
 require XML::Generator;
 
-sub BUILDARGS {
+sub new {
     my ( $self, $name, $value, $opts ) = @_;
     $opts ||= {};
 
-    return { name => $name, value => $value, %$opts };
+    die "name required" unless defined $name;
+    die "value required" unless defined $value;
+
+    $self = {
+        name  => $name,
+        value => $value,
+        %{$opts},
+    };
+    bless $self;
+
+    return $self;
 }
 
 sub to_xml {
     my $self = shift;
     my $gen = XML::Generator->new( ':std', escape => 'always,even-entities' );
-    my %attr = ( $self->boost ? ( boost => $self->boost ) : () );
+    my %attr = ( $self->{boost} ? ( boost => $self->{boost} ) : () );
 
-    return $gen->field( { name => $self->name, %attr }, $self->value );
+    my $x = $gen->field( { name => $self->{name}, %attr }, $self->{value} );
+    return $x;
 }
-
-no Moose;
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 

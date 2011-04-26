@@ -10,6 +10,10 @@ use HTTP::Request;
 use HTTP::Headers;
 use XML::Generator;
 
+use XML::Easy::Element;
+use XML::Easy::Content;
+use XML::Easy::Text qw(xml10_write_element);
+
 has 'url' => (
     is      => 'ro',
     isa     => 'URI',
@@ -58,17 +62,22 @@ sub add {
     my ( $self, $doc, $params ) = @_;
     my @docs = ref $doc eq 'ARRAY' ? @$doc : ( $doc );
 
+    my @elements = map {
+        if ( blessed $_ ) {
+            +'' => $_->to_element
+        } else {
+            +'' => WebService::Solr::Document->new(
+                ref $_ eq 'HASH' ? %$_ : @$_ )->to_element
+        }
+    } @docs;
+
     $params ||= {};
-    my $xml = $self->_xml_generator->add(
+    my $e = XML::Easy::Element->new(
+        'add',
         $params,
-        map {
-            if ( blessed $_ ) { $_->to_xml }
-            else {
-                WebService::Solr::Document->new(
-                    ref $_ eq 'HASH' ? %$_ : @$_ )->to_xml;
-            }
-            } @docs
+        XML::Easy::Content->new( [ @elements, '' ] ),
     );
+    my $xml = xml10_write_element($e);
 
     my $response = $self->_send_update( $xml );
     return $response->ok;
@@ -81,9 +90,9 @@ sub update {
 sub commit {
     my ( $self, $params ) = @_;
     $params ||= {};
-    my $response
-        = $self->_send_update( $self->_xml_generator->commit( $params ), {},
-        0 );
+    my $e   = XML::Easy::Element->new( 'commit', $params );
+    my $xml = xml10_write_element( $self->to_element );
+    my $response = $self->_send_update( $xml, {}, 0 );
     return $response->ok;
 }
 

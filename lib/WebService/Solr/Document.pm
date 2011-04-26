@@ -3,7 +3,10 @@ package WebService::Solr::Document;
 use Moose;
 
 use WebService::Solr::Field;
-require XML::Generator;
+
+use XML::Easy::Element;
+use XML::Easy::Content;
+use XML::Easy::Text qw(xml10_write_element);
 
 has 'fields' => (
     is         => 'rw',
@@ -65,12 +68,23 @@ sub values_for {
     return map { $_->value } grep { $_->name eq $key } $self->fields;
 }
 
-sub to_xml {
+sub to_element {
     my $self = shift;
-    my $gen = XML::Generator->new( ':std', escape => 'always,even-entities' );
     my %attr = ( $self->boost ? ( boost => $self->boost ) : () );
 
-    return $gen->doc( \%attr, map { $_->to_xml } $self->fields );
+    my @elements = map { +'' => $_->to_element } $self->fields;
+
+    return XML::Easy::Element->new(
+        'doc',
+        \%attr,
+        XML::Easy::Content->new( [ @elements, '' ] ),
+    );
+}
+
+sub to_xml {
+    my $self = shift;
+
+    return xml10_write_element($self->to_element);
 }
 
 no Moose;
@@ -135,6 +149,10 @@ Returns the first value for C<$name>.
 =head2 values_for( $name )
 
 Returns all values for C<$name>.
+
+=head2 to_element( )
+
+Serializes the object to an XML::Easy::Element object.
 
 =head2 to_xml( )
 

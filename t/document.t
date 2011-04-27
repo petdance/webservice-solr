@@ -33,21 +33,21 @@ my @field_objs = map { WebService::Solr::Field->new( @$_ ) } @fields;
     {
         my $doc = WebService::Solr::Document->new( @fields[ 0 .. 4 ] );
         isa_ok( $doc, 'WebService::Solr::Document' );
-        $doc->{boost} = '3.0';
+        $doc->boost( '3.0' );
         is( $doc->to_xml, $expect, 'to_xml(), array refs' );
     }
 
     {
         my $doc = WebService::Solr::Document->new( @field_objs[ 0 .. 4 ] );
         isa_ok( $doc, 'WebService::Solr::Document' );
-        $doc->{boost} = '3.0';
+        $doc->boost( '3.0' );
         is( $doc->to_xml, $expect, 'to_xml(), objs' );
     }
 
     {
         my $doc = WebService::Solr::Document->new();
         isa_ok( $doc, 'WebService::Solr::Document' );
-        $doc->{boost} = '3.0';
+        $doc->boost( '3.0' );
         $doc->add_fields( @field_objs[ 0 .. 4 ] );
         is( $doc->to_xml, $expect, 'to_xml(), add_fields()' );
     }
@@ -59,7 +59,7 @@ my @field_objs = map { WebService::Solr::Field->new( @$_ ) } @fields;
             $field_objs[ 4 ]
         );
         isa_ok( $doc, 'WebService::Solr::Document' );
-        $doc->{boost} = '3.0';
+        $doc->boost( '3.0' );
         is( $doc->to_xml, $expect, 'to_xml(), mixed' );
     }
 }
@@ -121,7 +121,7 @@ my @field_objs = map { WebService::Solr::Field->new( @$_ ) } @fields;
 {
     my $doc = WebService::Solr::Document->new( x => [ 1, 2, 3 ] );
     isa_ok( $doc, 'WebService::Solr::Document' );
-    is( scalar @{ $doc->{fields} }, 3, 'arrayref of values to fields' );
+    is( scalar @{ $doc->fields }, 3, 'arrayref of values to fields' );
 }
 
 {

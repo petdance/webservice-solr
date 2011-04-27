@@ -19,12 +19,30 @@ sub new {
     return $self;
 }
 
+sub name {
+    my $self = shift;
+    $self->{name} = $_[0] if $_[0];
+    return $self->{name};
+}
+
+sub value {
+    my $self = shift;
+    $self->{value} = $_[0] if $_[0];
+    return $self->{value};
+}
+
+sub boost {
+    my $self = shift;
+    $self->{boost} = $_[0] if $_[0];
+    return $self->{boost};
+}
+
 sub to_xml {
     my $self = shift;
     my $gen = XML::Generator->new( ':std', escape => 'always,even-entities' );
-    my %attr = ( $self->{boost} ? ( boost => $self->{boost} ) : () );
+    my %attr = ( $self->boost ? ( boost => $self->boost ) : () );
 
-    my $x = $gen->field( { name => $self->{name}, %attr }, $self->{value} );
+    my $x = $gen->field( { name => $self->name, %attr }, $self->value );
     return $x;
 }
 

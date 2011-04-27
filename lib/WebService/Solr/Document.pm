@@ -14,9 +14,21 @@ sub new {
     return \%self;
 }
 
+sub boost {
+    my $self = shift;
+    $self->{boost} = $_[0] if $_[0];
+    return $self->{boost};
+}
+
+sub fields {
+    my $self = shift;
+    $self->{fields} = $_[0] if $_[0];
+    return $self->{fields};
+}
+
 sub add_fields {
     my ( $self, @fields ) = @_;
-    $self->{fields} = [ @{$self->{fields}}, _parse_fields( @fields ) ];
+    $self->fields( [ @{$self->fields}, _parse_fields( @fields ) ] );
 }
 
 sub _parse_fields {
@@ -45,7 +57,7 @@ sub _parse_fields {
 
 sub field_names {
     my ( $self ) = @_;
-    my %names = map { $_->{name} => 1 } @{$self->{fields}};
+    my %names = map { $_->name => 1 } @{$self->fields};
     return keys %names;
 }
 
@@ -56,15 +68,15 @@ sub value_for {
 
 sub values_for {
     my ( $self, $key ) = @_;
-    return map { $_->{value} } grep { $_->{name} eq $key } @{$self->{fields}};
+    return map { $_->value } grep { $_->name eq $key } @{$self->fields};
 }
 
 sub to_xml {
     my $self = shift;
     my $gen = XML::Generator->new( ':std', escape => 'always,even-entities' );
-    my %attr = ( $self->{boost} ? ( boost => $self->{boost} ) : () );
+    my %attr = ( $self->boost ? ( boost => $self->boost ) : () );
 
-    my $x = $gen->doc( \%attr, map { $_->to_xml } @{$self->{fields}} );
+    my $x = $gen->doc( \%attr, map { $_->to_xml } @{$self->fields} );
     return $x;
 }
 

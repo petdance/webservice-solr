@@ -25,12 +25,12 @@ sub boost {
 sub fields {
     my $self = shift;
     $self->{ fields } = $_[ 0 ] if @_;
-    return $self->{ fields };
+    return wantarray ? @{ $self->{ fields } } : $self->{ fields };
 }
 
 sub add_fields {
     my ( $self, @fields ) = @_;
-    $self->fields( [ @{ $self->fields }, _parse_fields( @fields ) ] );
+    $self->fields( [ $self->fields, _parse_fields( @fields ) ] );
 }
 
 sub _parse_fields {
@@ -60,7 +60,7 @@ sub _parse_fields {
 
 sub field_names {
     my ( $self ) = @_;
-    my %names = map { $_->name => 1 } @{ $self->fields };
+    my %names = map { $_->name => 1 } $self->fields;
     return keys %names;
 }
 
@@ -71,14 +71,14 @@ sub value_for {
 
 sub values_for {
     my ( $self, $key ) = @_;
-    return map { $_->value } grep { $_->name eq $key } @{ $self->fields };
+    return map { $_->value } grep { $_->name eq $key } $self->fields;
 }
 
 sub to_element {
     my $self = shift;
     my %attr = ( $self->boost ? ( boost => $self->boost ) : () );
 
-    my @elements = map { ( '' => $_->to_element ) } @{ $self->fields };
+    my @elements = map { ( '' => $_->to_element ) } $self->fields;
 
     return XML::Easy::Element->new( 'doc', \%attr,
         XML::Easy::Content->new( [ @elements, '' ] ),

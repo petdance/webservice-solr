@@ -21,14 +21,32 @@ sub new {
     return $self;
 }
 
+sub name {
+    my $self = shift;
+    $self->{name} = $_[0] if $_[0];
+    return $self->{name};
+}
+
+sub value {
+    my $self = shift;
+    $self->{value} = $_[0] if $_[0];
+    return $self->{value};
+}
+
+sub boost {
+    my $self = shift;
+    $self->{boost} = $_[0] if $_[0];
+    return $self->{boost};
+}
+
 sub to_element {
     my $self = shift;
-    my %attr = ( $self->{boost} ? ( boost => $self->{boost} ) : () );
+    my %attr = ( $self->boost ? ( boost => $self->boost ) : () );
 
     return XML::Easy::Element->new(
         'field',
-        { name => $self->{name}, %attr },
-        XML::Easy::Content->new( [ $self->{value} ] ),
+        { name => $self->name, %attr },
+        XML::Easy::Content->new( [ $self->value ] ),
     );
 }
 
@@ -37,6 +55,7 @@ sub to_xml {
 
     return xml10_write_element($self->to_element);
 }
+
 
 1;
 

@@ -39,13 +39,13 @@ BEGIN { use_ok( 'WebService::Solr::Field' ); }
 
 {
     my $f = WebService::Solr::Field->new( foo => 'This & That' );
-    my $expected = '<field name="foo">This &amp; That</field>';
+    my $expected = '<field name="foo">This &#x26; That</field>';
     is( $f->to_xml, $expected, 'to_xml(), escaped (1)' );
 }
 
 {
     my $f = WebService::Solr::Field->new( foo => 'This &amp; That' );
-    my $expected = '<field name="foo">This &amp;amp; That</field>';
+    my $expected = '<field name="foo">This &#x26;amp; That</field>';
     is( $f->to_xml, $expected, 'to_xml(), escaped (2)' );
 }
 

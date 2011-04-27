@@ -9,12 +9,11 @@ use Scalar::Util 'blessed';
 sub new {
     my ( $class, @fields ) = @_;
 
-    my %self;
-    $self{ fields } = [ _parse_fields( @fields ) ];
+    my $self = {
+        fields => [ _parse_fields( @fields ) ]
+    };
 
-    bless \%self;
-
-    return \%self;
+    return bless $self, $class;
 }
 
 sub boost {

@@ -5,20 +5,19 @@ use XML::Easy::Content;
 use XML::Easy::Text ();
 
 sub new {
-    my ( $self, $name, $value, $opts ) = @_;
+    my ( $class, $name, $value, $opts ) = @_;
     $opts ||= {};
 
     die "name required"  unless defined $name;
     die "value required" unless defined $value;
 
-    $self = {
+    my $self = {
         name  => $name,
         value => $value,
         %{ $opts },
     };
-    bless $self;
 
-    return $self;
+    return bless $self, $class;
 }
 
 sub name {

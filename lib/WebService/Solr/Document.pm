@@ -1,16 +1,16 @@
 package WebService::Solr::Document;
 
 use WebService::Solr::Field;
-
 use XML::Easy::Element;
 use XML::Easy::Content;
-use XML::Easy::Text qw(xml10_write_element);
+use XML::Easy::Text ();
+use Scalar::Util 'blessed';
 
 sub new {
     my ( $class, @fields ) = @_;
 
     my %self;
-    $self{fields} = [ _parse_fields( @fields ) ];
+    $self{ fields } = [ _parse_fields( @fields ) ];
 
     bless \%self;
 
@@ -19,19 +19,19 @@ sub new {
 
 sub boost {
     my $self = shift;
-    $self->{boost} = $_[0] if $_[0];
-    return $self->{boost};
+    $self->{ boost } = $_[ 0 ] if @_;
+    return $self->{ boost };
 }
 
 sub fields {
     my $self = shift;
-    $self->{fields} = $_[0] if $_[0];
-    return $self->{fields};
+    $self->{ fields } = $_[ 0 ] if @_;
+    return $self->{ fields };
 }
 
 sub add_fields {
     my ( $self, @fields ) = @_;
-    $self->fields( [ @{$self->fields}, _parse_fields( @fields ) ] );
+    $self->fields( [ @{ $self->fields }, _parse_fields( @fields ) ] );
 }
 
 sub _parse_fields {
@@ -40,7 +40,7 @@ sub _parse_fields {
 
     # handle field objects, array refs and normal k => v pairs
     while ( my $f = shift @fields ) {
-        if ( ref $f eq 'WebService::Solr::Field' ) {
+        if ( blessed $f ) {
             push @new_fields, $f;
             next;
         }
@@ -50,7 +50,8 @@ sub _parse_fields {
         }
 
         my $v = shift @fields;
-        my @values = ( ref $v and ref $v ne 'WebService::Solr::Field' ) ? @$v : $v;
+        my @values
+            = ( ref $v and ref $v ne 'WebService::Solr::Field' ) ? @$v : $v;
         push @new_fields,
             map { WebService::Solr::Field->new( $f => "$_" ) } @values;
     }
@@ -60,7 +61,7 @@ sub _parse_fields {
 
 sub field_names {
     my ( $self ) = @_;
-    my %names = map { $_->name => 1 } @{$self->fields};
+    my %names = map { $_->name => 1 } @{ $self->fields };
     return keys %names;
 }
 
@@ -71,18 +72,16 @@ sub value_for {
 
 sub values_for {
     my ( $self, $key ) = @_;
-    return map { $_->value } grep { $_->name eq $key } @{$self->fields};
+    return map { $_->value } grep { $_->name eq $key } @{ $self->fields };
 }
 
 sub to_element {
     my $self = shift;
     my %attr = ( $self->boost ? ( boost => $self->boost ) : () );
 
-    my @elements = map { +'' => $_->to_element } @{$self->fields};
+    my @elements = map { ( '' => $_->to_element ) } @{ $self->fields };
 
-    return XML::Easy::Element->new(
-        'doc',
-        \%attr,
+    return XML::Easy::Element->new( 'doc', \%attr,
         XML::Easy::Content->new( [ @elements, '' ] ),
     );
 }
@@ -90,7 +89,7 @@ sub to_element {
 sub to_xml {
     my $self = shift;
 
-    return xml10_write_element($self->to_element);
+    return XML::Easy::Text::xml10_write_element( $self->to_element );
 }
 
 1;

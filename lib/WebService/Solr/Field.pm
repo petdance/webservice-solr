@@ -2,19 +2,19 @@ package WebService::Solr::Field;
 
 use XML::Easy::Element;
 use XML::Easy::Content;
-use XML::Easy::Text qw(xml10_write_element);
+use XML::Easy::Text ();
 
 sub new {
     my ( $self, $name, $value, $opts ) = @_;
     $opts ||= {};
 
-    die "name required" unless defined $name;
+    die "name required"  unless defined $name;
     die "value required" unless defined $value;
 
     $self = {
         name  => $name,
         value => $value,
-        %{$opts},
+        %{ $opts },
     };
     bless $self;
 
@@ -23,20 +23,20 @@ sub new {
 
 sub name {
     my $self = shift;
-    $self->{name} = $_[0] if $_[0];
-    return $self->{name};
+    $self->{ name } = $_[ 0 ] if @_;
+    return $self->{ name };
 }
 
 sub value {
     my $self = shift;
-    $self->{value} = $_[0] if $_[0];
-    return $self->{value};
+    $self->{ value } = $_[ 0 ] if @_;
+    return $self->{ value };
 }
 
 sub boost {
     my $self = shift;
-    $self->{boost} = $_[0] if $_[0];
-    return $self->{boost};
+    $self->{ boost } = $_[ 0 ] if @_;
+    return $self->{ boost };
 }
 
 sub to_element {
@@ -53,9 +53,8 @@ sub to_element {
 sub to_xml {
     my $self = shift;
 
-    return xml10_write_element($self->to_element);
+    return XML::Easy::Text::xml10_write_element( $self->to_element );
 }
-
 
 1;
 

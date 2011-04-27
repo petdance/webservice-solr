@@ -8,11 +8,9 @@ use LWP::UserAgent;
 use WebService::Solr::Response;
 use HTTP::Request;
 use HTTP::Headers;
-use XML::Generator;
-
 use XML::Easy::Element;
 use XML::Easy::Content;
-use XML::Easy::Text qw(xml10_write_element);
+use XML::Easy::Text ();
 
 has 'url' => (
     is      => 'ro',
@@ -30,14 +28,6 @@ has 'default_params' => (
     isa        => 'HashRef',
     auto_deref => 1,
     default    => sub { { wt => 'json' } }
-);
-
-has '_xml_generator' => (
-    is       => 'ro',
-    init_arg => undef,
-    default  => sub {
-        XML::Generator->new( ':std', escape => 'always,even-entities' );
-    },
 );
 
 our $VERSION = '0.12';
@@ -63,21 +53,21 @@ sub add {
     my @docs = ref $doc eq 'ARRAY' ? @$doc : ( $doc );
 
     my @elements = map {
-        if ( blessed $_ ) {
-            +'' => $_->to_element
-        } else {
-            +'' => WebService::Solr::Document->new(
-                ref $_ eq 'HASH' ? %$_ : @$_ )->to_element
-        }
+        (   '',
+            blessed $_
+            ? $_->to_element
+            : WebService::Solr::Document->new(
+                ref $_ eq 'HASH' ? %$_ : @$_
+                )->to_element
+            )
     } @docs;
 
     $params ||= {};
-    my $e = XML::Easy::Element->new(
-        'add',
-        $params,
+    my $e
+        = XML::Easy::Element->new( 'add', $params,
         XML::Easy::Content->new( [ @elements, '' ] ),
-    );
-    my $xml = xml10_write_element($e);
+        );
+    my $xml = XML::Easy::Text::xml10_write_element( $e );
 
     my $response = $self->_send_update( $xml );
     return $response->ok;
@@ -90,8 +80,8 @@ sub update {
 sub commit {
     my ( $self, $params ) = @_;
     $params ||= {};
-    my $e   = XML::Easy::Element->new( 'commit', $params );
-    my $xml = xml10_write_element( $self->to_element );
+    my $e        = XML::Easy::Element->new( 'commit', $params, [ '' ] );
+    my $xml      = XML::Easy::Text::xml10_write_element( $e );
     my $response = $self->_send_update( $xml, {}, 0 );
     return $response->ok;
 }
@@ -105,19 +95,25 @@ sub rollback {
 sub optimize {
     my ( $self, $params ) = @_;
     $params ||= {};
-    my $gen = XML::Generator->new( ':std', escape => 'always,even-entities' );
-    my $response = $self->_send_update( $gen->optimize( $params ), {}, 0 );
+    my $e        = XML::Easy::Element->new( 'optimize', $params, [ '' ] );
+    my $xml      = XML::Easy::Text::xml10_write_element( $e );
+    my $response = $self->_send_update( $xml, {}, 0 );
     return $response->ok;
 }
 
 sub delete {
     my ( $self, $options ) = @_;
-    my $gen = $self->_xml_generator;
 
     my $xml = '';
     for my $k ( keys %$options ) {
         my $v = $options->{ $k };
-        $xml .= $gen->$k( $_ ) for ref $v ? @$v : $v;
+        $xml .= join(
+            '',
+            map {
+                XML::Easy::Text::xml10_write_element(
+                    XML::Easy::Element->new( $k, {}, [ $_ ] ) )
+                } ref $v ? @$v : $v
+        );
     }
 
     my $response = $self->_send_update( "<delete>${xml}</delete>" );
@@ -126,16 +122,12 @@ sub delete {
 
 sub delete_by_id {
     my ( $self, $id ) = @_;
-    my $response = $self->_send_update( "<delete><id>$id</id></delete>" );
-    return $response->ok;
+    return $self->delete( { id => $id } );
 }
 
 sub delete_by_query {
     my ( $self, $query ) = @_;
-    my $gen = $self->_xml_generator;
-    my $response
-        = $self->_send_update( $gen->delete( $gen->query( $query ) ) );
-    return $response->ok;
+    return $self->delete( { query => $query } );
 }
 
 sub ping {

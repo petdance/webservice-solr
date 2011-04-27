@@ -49,8 +49,7 @@ sub _parse_fields {
         }
 
         my $v = shift @fields;
-        my @values
-            = ( ref $v and ref $v ne 'WebService::Solr::Field' ) ? @$v : $v;
+        my @values = ( ref $v and !blessed $v ) ? @$v : $v;
         push @new_fields,
             map { WebService::Solr::Field->new( $f => "$_" ) } @values;
     }

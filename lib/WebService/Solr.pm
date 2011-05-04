@@ -11,6 +11,7 @@ use HTTP::Headers;
 use XML::Easy::Element;
 use XML::Easy::Content;
 use XML::Easy::Text ();
+use JSON::XS;
 
 has 'url' => (
     is      => 'ro',
@@ -28,6 +29,11 @@ has 'default_params' => (
     isa        => 'HashRef',
     auto_deref => 1,
     default    => sub { { wt => 'json' } }
+);
+
+has 'json' => (
+    is      => 'rw',
+    default => 0,
 );
 
 our $VERSION = '0.12';
@@ -52,24 +58,40 @@ sub add {
     my ( $self, $doc, $params ) = @_;
     my @docs = ref $doc eq 'ARRAY' ? @$doc : ( $doc );
 
-    my @elements = map {
-        (   '',
-            blessed $_
-            ? $_->to_element
-            : WebService::Solr::Document->new(
-                ref $_ eq 'HASH' ? %$_ : @$_
-                )->to_element
-            )
-    } @docs;
+    my $data;
 
-    $params ||= {};
-    my $e
-        = XML::Easy::Element->new( 'add', $params,
-        XML::Easy::Content->new( [ @elements, '' ] ),
-        );
-    my $xml = XML::Easy::Text::xml10_write_element( $e );
+    if ($self->json) {
+        # Solr's JSON update handler takes multiple "add" commands for
+        # multiple docs, unlike the XML version, so we have to serialize
+        # an "add" JSON object for each document, then remove the leading
+        # and trailing curly braces
+        my @adds = map { { add => { doc => $_ } } } @docs;
+        $data = sprintf('{%s}', join(',', map {
+            my $json = encode_json($_);
+            $json = substr($json, 1);
+            $json = substr($json, 0, length($json) - 1);
+            $json
+        } @adds));
+    } else {
+        my @elements = map {
+            (   '',
+                blessed $_
+                ? $_->to_element
+                : WebService::Solr::Document->new(
+                    ref $_ eq 'HASH' ? %$_ : @$_
+                    )->to_element
+                )
+        } @docs;
 
-    my $response = $self->_send_update( $xml );
+        $params ||= {};
+        my $e
+            = XML::Easy::Element->new( 'add', $params,
+            XML::Easy::Content->new( [ @elements, '' ] ),
+            );
+        $data = XML::Easy::Text::xml10_write_element( $e );
+    }
+
+    my $response = $self->_send_update( $data );
     return $response->ok;
 }
 
@@ -167,15 +189,30 @@ sub _gen_url {
 }
 
 sub _send_update {
-    my ( $self, $xml, $params, $autocommit ) = @_;
+    my ( $self, $data, $params, $autocommit ) = @_;
     $autocommit = $self->autocommit unless defined $autocommit;
 
-    my $url = $self->_gen_url( 'update', $params );
-    my $req = HTTP::Request->new(
-        POST => $url,
-        HTTP::Headers->new( Content_Type => 'text/xml; charset=utf-8' ),
-        '<?xml version="1.0" encoding="UTF-8"?>' . encode( 'utf8', "$xml" )
-    );
+    my $req;
+    my $utf8 = 'charset=utf-8';
+
+    if ($self->json) {
+        my $url = $self->_gen_url('update/json', $params);
+
+        $req = HTTP::Request->new(
+            POST => $url,
+            HTTP::Headers->new( Content_Type => "application/json; $utf8" ),
+            encode( 'utf8', "$data" ),
+        );
+    } else {
+        my $url = $self->_gen_url( 'update', $params );
+        my $xml_header = '<?xml version="1.0" encoding="UTF-8"?>';
+
+        $req = HTTP::Request->new(
+            POST => $url,
+            HTTP::Headers->new( Content_Type => "text/xml; $utf8" ),
+            $xml_header . encode( 'utf8', "$data" ),
+        );
+    }
 
     my $http_response = $self->agent->request( $req );
     if ( $http_response->is_error ) {

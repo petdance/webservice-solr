@@ -1,5 +1,10 @@
 Revision history for Perl extension WebService::Solr.
 
+0.13 2011-05-05
+ - Replace XML::Generator with XML::Easy and de-mooseify the Document and
+   Field classes to help speed up (about 3x) document creation and
+   serialization.
+
 0.12 2011-04-12
  - Clean up docs in relation to autocommit
  - Handle blessed field values (Dan Brook)

@@ -65,14 +65,10 @@ sub _build_pager {
     return unless exists $struct->{ response }->{ numFound };
 
     my $rows = $struct->{ responseHeader }->{ params }->{ rows };
-
-    # rows not explicitly set, find default from rows returned
-    if ( !defined $rows ) {
-        $rows = scalar @{ $struct->{ response }->{ docs } };
-    }
+    $rows = 10 unless defined $rows;
 
     # do not generate a pager for queries explicitly requesting no rows
-    return if defined $rows && $rows == 0;
+    return if $rows == 0;
 
     my $pager = Data::Page->new;
     $pager->total_entries( $struct->{ response }->{ numFound } );
@@ -105,14 +101,10 @@ sub _build_pageset {
     return unless exists $struct->{ response }->{ numFound };
 
     my $rows = $struct->{ responseHeader }->{ params }->{ rows };
+    $rows = 10 unless defined $rows;
 
     # do not generate a pager for queries explicitly requesting no rows
-    return if defined $rows && $rows == 0;
-
-    # rows not explicitly set, find default from rows returned
-    if ( !defined $rows ) {
-        $rows = scalar @{ $struct->{ response }->{ docs } };
-    }
+    return if $rows == 0;
 
     my $pager = Data::Pageset->new(
         {   total_entries    => $struct->{ response }->{ numFound },

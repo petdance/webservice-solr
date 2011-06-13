@@ -1,5 +1,11 @@
 Revision history for Perl extension WebService::Solr.
 
+0.14 2011-06-13
+ - Fix broken logic for figuring out rows per page when not explicitly
+   specified. It was broken on the last page when the number of rows
+   returned was less than the default. We now just assume 10 rows which
+   is the default in Solr.
+
 0.13 2011-05-05
  - Replace XML::Generator with XML::Easy and de-mooseify the Document and
    Field classes to help speed up (about 3x) document creation and

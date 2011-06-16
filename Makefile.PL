@@ -20,7 +20,7 @@ requires 'Encode';
 
 test_requires 'Test::More';
 test_requires 'XML::Simple';
-test_requires 'Test::Mock::LWP';
+test_requires 'Test::Mock::LWP' => '0.05';
 
 tests_recursive;
 

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 5;
 use Test::Mock::LWP;
 
 $Mock_ua->mock(
@@ -20,7 +20,9 @@ my $expect;
 
 {
     $expect = 'http://localhost:8983/solr/admin/ping?wt=json';
+    is $solr->last_response, undef, "The last_response attribute hasn't been set yet";
     $solr->ping();
+    isa_ok $solr->last_response, 'WebService::Solr::Response';
 }
 
 sub _test_req {

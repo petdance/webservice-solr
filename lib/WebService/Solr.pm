@@ -30,6 +30,11 @@ has 'default_params' => (
     default    => sub { { wt => 'json' } }
 );
 
+has 'last_response' => (
+    is  => 'rw',
+    isa => 'Maybe[WebService::Solr::Response]',
+);
+
 our $VERSION = '0.14';
 
 sub BUILDARGS {
@@ -132,9 +137,9 @@ sub delete_by_query {
 
 sub ping {
     my ( $self ) = @_;
-    my $response = WebService::Solr::Response->new(
-        $self->agent->get( $self->_gen_url( 'admin/ping' ) ) );
-    return $response->is_success;
+    $self->last_response( WebService::Solr::Response->new(
+        $self->agent->get( $self->_gen_url( 'admin/ping' ) ) ) );
+    return $self->last_response->is_success;
 }
 
 sub search {
@@ -151,9 +156,9 @@ sub auto_suggest {
 sub generic_solr_request {
     my ( $self, $path, $params ) = @_;
     $params ||= {};
-    my $response = WebService::Solr::Response->new(
-        $self->agent->get( $self->_gen_url( $path, $params ) ) );
-    return $response;
+    return $self->last_response(
+        WebService::Solr::Response->new(
+            $self->agent->get( $self->_gen_url( $path, $params ) ) ) );
 }
 
 sub _gen_url {
@@ -182,11 +187,11 @@ sub _send_update {
         confess $http_response->status_line . ': ' . $http_response->content;
     }
 
-    my $res = WebService::Solr::Response->new( $http_response );
+    $self->last_response( WebService::Solr::Response->new( $http_response ) );
 
     $self->commit if $autocommit;
 
-    return $res;
+    return $self->last_response;
 }
 
 no Moose;

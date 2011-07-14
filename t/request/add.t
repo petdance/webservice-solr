@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 use Test::Mock::LWP;
 
 use XML::Simple;
@@ -22,8 +22,10 @@ isa_ok( $solr, 'WebService::Solr' );
 my $expect;
 
 {
+    is $solr->last_response, undef, "The last_response attribute hasn't been set yet";
     $expect = { doc => { field => { name => 'foo', content => 'bar' } } };
     $solr->add( { foo => 'bar' } );
+    isa_ok $solr->last_response, 'WebService::Solr::Response';
     $solr->update( { foo => 'bar' } );
 }
 

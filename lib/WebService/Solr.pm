@@ -35,7 +35,7 @@ has 'last_response' => (
     isa => 'Maybe[WebService::Solr::Response]',
 );
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 sub BUILDARGS {
     my ( $self, $url, $options ) = @_;
@@ -232,6 +232,8 @@ enterprise-grade indexing and searching platform.
 =item * autocommit - a boolean value for automatic commit() after add/update/delete (default: enabled)
 
 =item * default_params - a hashref of parameters to send on every request
+
+=item * last_response - stores a WebService::Solr::Response for the last request
 
 =back
 

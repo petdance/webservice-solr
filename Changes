@@ -1,5 +1,9 @@
 Revision history for Perl extension WebService::Solr.
 
+0.15 2011-07-14
+ - Add a last_response accessor to get the most recent 
+   WebService::Solr::Response object (Dan Brook)
+
 0.14 2011-06-13
  - Fix broken logic for figuring out rows per page when not explicitly
    specified. It was broken on the last page when the number of rows

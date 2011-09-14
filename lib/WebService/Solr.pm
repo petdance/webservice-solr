@@ -1,6 +1,6 @@
 package WebService::Solr;
 
-use Moose;
+use Any::Moose;
 
 use Encode qw(encode);
 use URI;
@@ -194,7 +194,7 @@ sub _send_update {
     return $self->last_response;
 }
 
-no Moose;
+no Any::Moose;
 
 __PACKAGE__->meta->make_immutable;
 

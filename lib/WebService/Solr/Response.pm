@@ -1,6 +1,6 @@
 package WebService::Solr::Response;
 
-use Moose;
+use Any::Moose;
 
 use WebService::Solr::Document;
 use Data::Page;
@@ -136,7 +136,7 @@ sub ok {
     return defined $status && $status == 0;
 }
 
-no Moose;
+no Any::Moose;
 
 __PACKAGE__->meta->make_immutable;
 

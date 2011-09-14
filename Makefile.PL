@@ -15,7 +15,7 @@ requires 'Data::Page';
 requires 'Data::Pageset';
 requires 'XML::Easy';
 requires 'JSON::XS';
-requires 'Moose';
+requires 'Any::Moose';
 requires 'Encode';
 
 test_requires 'Test::More';

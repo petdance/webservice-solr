@@ -1,6 +1,6 @@
 package WebService::Solr::Query;
 
-use Moose;
+use Any::Moose;
 
 use overload q("") => 'stringify';
 
@@ -270,7 +270,7 @@ sub ___log {
     print "# $who: $msg\n";
 }
 
-no Moose;
+no Any::Moose;
 
 __PACKAGE__->meta->make_immutable;
 

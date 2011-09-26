@@ -15,7 +15,7 @@ requires 'Data::Page';
 requires 'Data::Pageset';
 requires 'XML::Easy';
 requires 'JSON::XS';
-requires 'Any::Moose';
+requires 'Any::Moose' => '0.16'; # 0.16 doesn't force Mouse dep
 requires 'Encode';
 
 test_requires 'Test::More';

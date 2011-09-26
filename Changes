@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService::Solr.
 
+0.16 TO BE RELEASED
+ - Switch to Any::Moose so that Mouse may be used (Kevin Goess)
+
 0.15 2011-07-14
  - Add a last_response accessor to get the most recent 
    WebService::Solr::Response object (Dan Brook)

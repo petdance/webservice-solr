@@ -35,7 +35,7 @@ has 'last_response' => (
     isa => 'Maybe[WebService::Solr::Response]',
 );
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 sub BUILDARGS {
     my ( $self, $url, $options ) = @_;

@@ -1,6 +1,6 @@
 Revision history for Perl extension WebService::Solr.
 
-0.16 TO BE RELEASED
+0.16 2011-10-11
  - Switch to Any::Moose so that Mouse may be used (Kevin Goess)
 
 0.15 2011-07-14

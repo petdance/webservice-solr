@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService::Solr.
 
+0.17 2012-03-29
+ - Changed the solr search to use a post request (Robert Ward)
+
 0.16 2011-10-11
  - Switch to Any::Moose so that Mouse may be used (Kevin Goess)
 

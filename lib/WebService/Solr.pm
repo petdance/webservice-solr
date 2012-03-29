@@ -158,7 +158,9 @@ sub generic_solr_request {
     $params ||= {};
     return $self->last_response(
         WebService::Solr::Response->new(
-            $self->agent->get( $self->_gen_url( $path, $params ) ) ) );
+            $self->agent->post(
+                $self->_gen_url( $path ),
+                $params ) ) );
 }
 
 sub _gen_url {

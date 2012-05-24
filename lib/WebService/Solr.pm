@@ -160,7 +160,8 @@ sub generic_solr_request {
         WebService::Solr::Response->new(
             $self->agent->post(
                 $self->_gen_url( $path ),
-                $params ) ) );
+                Content_Type => 'application/x-www-form-urlencoded; charset=utf-8',
+                Content => $params ) ) );
 }
 
 sub _gen_url {

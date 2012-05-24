@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService::Solr.
 
+0.18 2012-05-24
+ - Force previous switch to a post request to be utf-8 encoded
+
 0.17 2012-03-29
  - Changed the solr search to use a post request (Robert Ward)
 

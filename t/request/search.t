@@ -6,7 +6,10 @@ use Test::Mock::LWP;
 
 $Mock_ua->mock(
     post => sub {
-        _test_req( $_[ 1 ], $_[ 2 ] );
+        my $mock = shift;
+        my $uri  = shift;
+        my $params = { @_ };
+        _test_req( $uri, $params );
         return HTTP::Response->new;
     }
 );
@@ -28,7 +31,8 @@ my ( $expect_path, $expect_url, $expect_params );
 }
 
 sub _test_req {
-    is( $_[ 0 ]->path, $expect_path, ' search() path ' );
-    is_deeply( { $_[ 0 ]->query_form }, $expect_url, ' search() params ' );
-    is_deeply( $_[ 1 ], $expect_params, ' search() params ' );
+    my( $uri, $params ) = @_;
+    is( $uri->path, $expect_path, 'search() path' );
+    is_deeply( { $uri->query_form }, $expect_url, 'search() params not in uri' );
+    is_deeply( $params->{ Content }, $expect_params, 'search() params in post content' );
 }

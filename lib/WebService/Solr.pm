@@ -161,16 +161,14 @@ sub generic_solr_request {
             $self->agent->post(
                 $self->_gen_url( $path ),
                 Content_Type => 'application/x-www-form-urlencoded; charset=utf-8',
-                Content => $params ) ) );
+                Content => { $self->default_params, %$params } ) ) );
 }
 
 sub _gen_url {
-    my ( $self, $handler, $params ) = @_;
-    $params ||= {};
+    my ( $self, $handler ) = @_;
 
     my $url = $self->url->clone;
     $url->path( $url->path . "/$handler" );
-    $url->query_form( { $self->default_params, %$params } );
     return $url;
 }
 
@@ -178,7 +176,9 @@ sub _send_update {
     my ( $self, $xml, $params, $autocommit ) = @_;
     $autocommit = $self->autocommit unless defined $autocommit;
 
-    my $url = $self->_gen_url( 'update', $params );
+    $params ||= {};
+    my $url = $self->_gen_url( 'update' );
+    $url->query_form( { $self->default_params, %$params } );
     my $req = HTTP::Request->new(
         POST => $url,
         HTTP::Headers->new( Content_Type => 'text/xml; charset=utf-8' ),

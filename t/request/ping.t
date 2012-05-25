@@ -19,7 +19,7 @@ isa_ok( $solr, 'WebService::Solr' );
 my $expect;
 
 {
-    $expect = 'http://localhost:8983/solr/admin/ping?wt=json';
+    $expect = 'http://localhost:8983/solr/admin/ping';
     is $solr->last_response, undef, "The last_response attribute hasn't been set yet";
     $solr->ping();
     isa_ok $solr->last_response, 'WebService::Solr::Response';

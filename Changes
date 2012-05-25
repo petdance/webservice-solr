@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService::Solr.
 
+0.19 2012-05-25
+ - Merge default_params in with other params in the post body
+
 0.18 2012-05-24
  - Force previous switch to a post request to be utf-8 encoded
 

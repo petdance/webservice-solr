@@ -1,8 +1,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 4;
 use Test::Mock::LWP;
+
+use WebService::Solr;
 
 $Mock_ua->mock(
     get => sub {
@@ -12,7 +14,6 @@ $Mock_ua->mock(
 );
 $Mock_response->mock( is_error => sub { return 0 } );
 
-use_ok( 'WebService::Solr' );
 my $solr = WebService::Solr->new();
 isa_ok( $solr, 'WebService::Solr' );
 

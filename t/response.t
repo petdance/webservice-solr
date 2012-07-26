@@ -4,12 +4,12 @@ use warnings;
 ### XXX Whitebox tests!
 use Test::More 'no_plan';
 
-use Data::Dumper;
 use HTTP::Headers;
 use HTTP::Response;
 
+use WebService::Solr::Response;
+
 my $Class = 'WebService::Solr::Response';
-use_ok( $Class );
 
 # $r = HTTP::Response->new( $code, $msg, $header, $content )
 my $SolrResponse = HTTP::Response->new(

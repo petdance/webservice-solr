@@ -3,9 +3,7 @@ use Test::More 'no_plan';
 use strict;
 use warnings;
 
-BEGIN {
-    use_ok( 'WebService::Solr::Query' );
-}
+use WebService::Solr::Query;
 
 {    # (un)escape
     is( WebService::Solr::Query->escape( '(1+1):2' ),

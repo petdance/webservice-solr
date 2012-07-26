@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService::Solr.
 
+NEXT
+ - Get rid of use_ok() in the tests.
+
 0.19 2012-05-25
  - Merge default_params in with other params in the post body
 

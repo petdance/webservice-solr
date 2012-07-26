@@ -1,4 +1,6 @@
 META.yml
+MYMETA.yml
+MYMETA.json
 Makefile
 Makefile.old
 cover_db

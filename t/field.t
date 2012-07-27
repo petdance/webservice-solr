@@ -1,9 +1,9 @@
-use Test::More tests => 10;
+use Test::More tests => 9;
 
 use strict;
 use warnings;
 
-BEGIN { use_ok( 'WebService::Solr::Field' ); }
+use WebService::Solr::Field;
 
 {
     my $f = WebService::Solr::Field->new( id => '0001' );

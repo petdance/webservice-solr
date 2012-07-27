@@ -1,12 +1,10 @@
-use Test::More tests => 25;
+use Test::More tests => 23;
 
 use strict;
 use warnings;
 
-BEGIN {
-    use_ok( 'WebService::Solr::Document' );
-    use_ok( 'WebService::Solr::Field' );
-}
+use WebService::Solr::Document;
+use WebService::Solr::Field;
 
 use JSON::XS;
 

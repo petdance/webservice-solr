@@ -3,9 +3,7 @@ use Test::More tests => 7;
 use strict;
 use warnings;
 
-BEGIN {
-    use_ok( 'WebService::Solr::Query' );
-}
+use WebService::Solr::Query;
 
 subtest 'Unescapes' => sub {
     is( WebService::Solr::Query->escape( '(1+1):2' ),

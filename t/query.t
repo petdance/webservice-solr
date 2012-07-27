@@ -1,4 +1,4 @@
-use Test::More 'no_plan';
+use Test::More tests => 7;
 
 use strict;
 use warnings;
@@ -7,15 +7,15 @@ BEGIN {
     use_ok( 'WebService::Solr::Query' );
 }
 
-{    # (un)escape
+subtest 'Unescapes' => sub {
     is( WebService::Solr::Query->escape( '(1+1):2' ),
         '\(1\+1\)\:2', 'escape' );
     is( WebService::Solr::Query->unescape( '\(1\+1\)\:2' ),
         '(1+1):2', 'unescape' );
-}
+};
 
-{    # basic queries
-        # default field
+subtest 'Basic queries' => sub {
+    # default field
     _check( query => { -default => 'space' }, expect => '("space")' );
     _check(
         query => { -default => [ 'star trek', 'star wars' ] },
@@ -55,18 +55,18 @@ BEGIN {
         expect =>
             '(("star trek" OR "star wars") AND (first:"Roger" OR first:"Dodger"))'
     );
-}
+};
 
-{    # basic query with escape
+subtest 'Basic query with escape' => sub {
     _check( query => { -default => 'sp(a)ce' }, expect => '("sp\(a\)ce")' );
     _check(
         query  => { title => 'Spaceb(a)lls' },
         expect => '(title:"Spaceb\(a\)lls")'
     );
-}
+};
 
-{    # simple ops
-        # range (inc)
+subtest 'Simple ops' => sub {
+    # range (inc)
     _check(
         query  => { title => { -range => [ 'a', 'z' ] } },
         expect => '(title:[a TO z])'
@@ -131,10 +131,9 @@ BEGIN {
         },
         expect => '((first:"Roger" OR first:"Dodger") AND title:space~0.8)'
     );
+};
 
-}
-
-{    # ops with escape
+subtest 'Ops with escape' => sub {
     _check(
         query => { title => { -boost => [ 'Sp(a)ce', '2.0' ] } },
         expect => '(title:"Sp\(a\)ce"^2.0)'
@@ -147,9 +146,9 @@ BEGIN {
         query => { title => { -fuzzy => [ 'sp(a)ce', '0.8' ] } },
         expect => '(title:sp\(a\)ce~0.8)'
     );
-}
+};
 
-{    # require and prohibit
+subtest 'Require and prohibit' => sub {
     _check(
         query  => { title => { -require => 'star' } },
         expect => '(+title:"star")'
@@ -178,10 +177,9 @@ BEGIN {
         },
         expect => '((first:"Roger" OR first:"Dodger") AND -title:"star")'
     );
-}
+};
 
-### nested and/or operators
-{
+subtest 'Nested and/or operators' => sub {
     _check(
         query => {
             title =>
@@ -199,8 +197,9 @@ BEGIN {
         },
         expect => q[(((title:{a TO c}) OR (title:{e TO k})))],
     );
+};
 
-}
+done_testing();
 
 sub _check {
     my %t = @_;

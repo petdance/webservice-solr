@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 ### XXX Whitebox tests!
-use Test::More 'no_plan';
+use Test::More tests => 5;
 
 use Data::Dumper;
 use HTTP::Headers;
@@ -19,18 +19,16 @@ my $SolrResponse = HTTP::Response->new(
 );
 
 my $Obj;
-### create tests
-{
-    ok( $SolrResponse, "Created dummy Solr response" );
+subtest 'Create tests' => sub {
+    ok( $SolrResponse, 'Created dummy Solr response' );
 
     $Obj = $Class->new( $SolrResponse );
     ok( $Obj, "   Created $Class object from $SolrResponse" );
-    isa_ok( $Obj, $Class, "       Object" );
-}
+    isa_ok( $Obj, $Class  );
+};
 
-### check accessors
-{
-    ok( $Obj, "Testing accessors" );
+subtest 'Check accessors' => sub {
+    ok( $Obj, 'Testing accessors' );
 
     for my $acc (
         qw[status_code status_message is_success is_error content docs pager pageset]
@@ -39,21 +37,19 @@ my $Obj;
         ok( $Obj->can( $acc ),  "   Obj->can( $acc )" );
         ok( defined $Obj->$acc, "       Value = " . $Obj->$acc );
     }
-}
+};
 
-### check docs
-{
+subtest 'Check docs' => sub {
     for my $doc ( $Obj->docs ) {
         ok( $doc, "Testing $doc" );
-        isa_ok( $doc, 'WebService::Solr::Document', "   Object" );
+        isa_ok( $doc, 'WebService::Solr::Document' );
 
         like( $doc->value_for( 'name' ),
             qr/foo/, "   Name = " . $doc->value_for( 'name' ) );
     }
-}
+};
 
-### check pagers
-{
+subtest 'Check pagers' => sub {
     for my $pager ( $Obj->pager, $Obj->pageset,
         $Obj->pageset( mode => 'fixed' ) )
     {
@@ -64,10 +60,9 @@ my $Obj;
         is( $pager->last_page,        5,  "   Last page = 5" );
         is( $pager->current_page,     3,  "   Current page = 2" );
     }
-}
+};
 
-### special case: 0 rows
-{
+subtest 'Special case: 0 rows' => sub {
     my $http_response = HTTP::Response->new(
         200 => 'OK',
         HTTP::Headers->new,
@@ -77,4 +72,6 @@ my $Obj;
     my $solr_response = $Class->new( $http_response );
     ok( !defined $solr_response->pager,   '0 rows, undef pager' );
     ok( !defined $solr_response->pageset, '0 rows, undef pageset' );
-}
+};
+
+done_testing();

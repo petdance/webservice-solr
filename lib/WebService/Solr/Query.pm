@@ -375,11 +375,6 @@ C<-range_inc>.
     my $q = WebService::Solr::Query->new( { foo => { -fuzzy => [ 'bar', '0.8' ] } } );
     # RESULT: (foo:bar~0.8)
 
-=head2 Boost
-
-    my $q = WebService::Solr::Query->new( { foo => { -boost => [ 'bar', '2.0' ] } } );
-    # RESULT: (foo:"bar"^2.0)
-
 =head2 Literal Queries
 
 Specifying a scalar ref as a value in a key-value pair will allow arbitrary

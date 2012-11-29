@@ -1,7 +1,8 @@
 Revision history for Perl extension WebService::Solr.
 
-NEXT
+0.21 2012-11-29
  - Get rid of use_ok() in the tests.
+ - Minor documentation fixes.
 
 0.20 2012-11-29
  - Avoid random hash key ordering issues (perl 5.17.6) when testing

@@ -1,5 +1,9 @@
 Revision history for Perl extension WebService::Solr.
 
+0.20 2012-11-29
+ - Avoid random hash key ordering issues (perl 5.17.6) when testing
+   WebService::Solr::Query (RT #81527)
+
 0.19 2012-05-25
  - Merge default_params in with other params in the post body
 

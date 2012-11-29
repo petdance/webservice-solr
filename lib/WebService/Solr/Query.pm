@@ -46,7 +46,7 @@ sub _struct_HASH {
 
     my @clauses;
 
-    for my $k ( keys %$struct ) {
+    for my $k ( sort keys %$struct ) {
         my $v = $struct->{ $k };
 
         D && $self->___log( "Key => $k, value => " . Dumper( $v ) );
@@ -165,7 +165,7 @@ sub _value_HASH {
 
     my @clauses;
 
-    for my $op ( keys %$v ) {
+    for my $op ( sort keys %$v ) {
         my $struct = $v->{ $op };
         $op =~ s{^-(.+)}{_op_$1};
 

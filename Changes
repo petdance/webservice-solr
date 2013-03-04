@@ -1,5 +1,9 @@
 Revision history for Perl extension WebService::Solr.
 
+NEXT
+ - Speed up ->value_for() to lazily find the first field, rather than
+   processing all of ->values_for() and taking the first value.
+
 0.21 2012-11-29
  - Get rid of use_ok() in the tests.
  - Minor documentation fixes.

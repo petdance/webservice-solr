@@ -1,3 +1,5 @@
+# WebService::Solr
+
 WebService::Solr is a Perl module to interface with the Solr web service.
 
 To install:
@@ -6,6 +8,8 @@ To install:
     make
     make test
     make install
+
+# Copyright & License
 
 Copyright 2008-2013 National Adult Literacy Database
 

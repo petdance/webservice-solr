@@ -1,9 +1,5 @@
 use inc::Module::Install 1.06;
 
-if ( -e 'MANIFEST.SKIP' ) {
-    system( 'pod2text lib/WebService/Solr.pm > README' );
-}
-
 perl_version '5.008';
 
 name 'WebService-Solr';
@@ -28,4 +24,3 @@ tests_recursive;
 repository 'http://github.com/bricas/webservice-solr';
 
 WriteAll;
-

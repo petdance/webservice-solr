@@ -64,8 +64,15 @@ sub field_names {
 }
 
 sub value_for {
-    my @values = shift->values_for( shift );
-    return $values[ 0 ];
+    my ( $self, $key ) = @_;
+
+    for my $field ( $self->fields ) {
+        if ( $field->name eq $key ) {
+            return $field->value;
+        }
+    }
+
+    return;
 }
 
 sub values_for {

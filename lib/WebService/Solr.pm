@@ -213,7 +213,7 @@ WebService::Solr - Module to interface with the Solr (Lucene) webservice
 
     my $solr = WebService::Solr->new;
     $solr->add( @docs );
-        
+
     my $response = $solr->search( $query );
     for my $doc ( $response->docs ) {
         print $doc->value_for( $id );
@@ -397,10 +397,10 @@ Kirk Beers
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2012 National Adult Literacy Database
+Copyright 2008-2013 National Adult Literacy Database
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =cut
 

@@ -38,9 +38,16 @@ sub boost {
     return $self->{ boost };
 }
 
+sub update {
+    my $self = shift;
+    $self->{ update } = $_[ 0 ] if @_;
+    return $self->{ update };
+}
+
 sub to_element {
     my $self = shift;
     my %attr = ( $self->boost ? ( boost => $self->boost ) : () );
+    $attr{update} = $self->update if $self->update;
 
     return XML::Easy::Element->new(
         'field',
@@ -81,6 +88,8 @@ name-value pair.
 =item * value - the field's value
 
 =item * boost - a floating-point boost value
+
+=item * update - if field should be used to update a document, can be either 'set' or 'add' (for multiValued fields). For Solr version 4 or above.
 
 =back
 

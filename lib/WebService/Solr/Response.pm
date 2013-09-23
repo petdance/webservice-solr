@@ -1,7 +1,8 @@
 package WebService::Solr::Response;
 
-use Any::Moose;
+use Moo;
 
+use Types::Standard qw(Object HashRef Maybe InstanceOf ArrayRef);
 use WebService::Solr::Document;
 use Data::Page;
 use Data::Pageset;
@@ -9,7 +10,7 @@ use JSON::XS ();
 
 has 'raw_response' => (
     is      => 'ro',
-    isa     => 'Object',
+    isa     => Object,
     handles => {
         status_code    => 'code',
         status_message => 'message',
@@ -18,17 +19,23 @@ has 'raw_response' => (
     },
 );
 
-has 'content' => ( is => 'rw', isa => 'HashRef', lazy_build => 1 );
+has 'content' => ( is => 'rw', isa => HashRef, lazy => 1, builder => 1 );
 
 has 'docs' =>
-    ( is => 'rw', isa => 'ArrayRef', auto_deref => 1, lazy_build => 1 );
+    ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 1 );
 
-has 'pager' => ( is => 'rw', isa => 'Maybe[Data::Page]', lazy_build => 1 );
+around docs => sub {
+    my ($orig, $self, @args) = @_;
+    my $ret = $self->$orig(@args);
+    return wantarray ? @$ret : $ret;
+};
+
+has 'pager' => ( is => 'rw', isa => Maybe[InstanceOf['Data::Page']], lazy => 1, builder => 1 );
 
 has '_pageset_slide' =>
-    ( is => 'rw', isa => 'Maybe[Data::Pageset]', lazy_build => 1 );
+    ( is => 'rw', isa => Maybe[InstanceOf['Data::Pageset']], lazy => 1, builder => 1, predicate => 1 );
 has '_pageset_fixed' =>
-    ( is => 'rw', isa => 'Maybe[Data::Pageset]', lazy_build => 1 );
+    ( is => 'rw', isa => Maybe[InstanceOf['Data::Pageset']], lazy => 1, builder => 1, predicate => 1 );
 
 sub BUILDARGS {
     my ( $self, $res ) = @_;
@@ -136,9 +143,7 @@ sub ok {
     return defined $status && $status == 0;
 }
 
-no Any::Moose;
-
-__PACKAGE__->meta->make_immutable;
+no Moo;
 
 1;
 
@@ -187,7 +192,7 @@ required.
 
 =head2 BUILDARGS( @args )
 
-A Moose override to allow our custom constructor.
+A Moo override to allow our custom constructor.
 
 =head2 facet_counts( )
 

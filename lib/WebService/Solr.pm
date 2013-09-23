@@ -1,7 +1,9 @@
 package WebService::Solr;
 
-use Any::Moose;
+use Moo;
 
+use Types::Standard qw(InstanceOf Object Bool HashRef Maybe);
+use Scalar::Util qw(blessed);
 use Encode qw(encode);
 use URI;
 use LWP::UserAgent;
@@ -14,25 +16,30 @@ use XML::Easy::Text ();
 
 has 'url' => (
     is      => 'ro',
-    isa     => 'URI',
+    isa     => InstanceOf['URI'],
     default => sub { URI->new( 'http://localhost:8983/solr' ) }
 );
 
 has 'agent' =>
-    ( is => 'ro', isa => 'Object', default => sub { LWP::UserAgent->new } );
+    ( is => 'ro', isa => Object, default => sub { LWP::UserAgent->new } );
 
-has 'autocommit' => ( is => 'ro', isa => 'Bool', default => 1 );
+has 'autocommit' => ( is => 'ro', isa => Bool, default => 1 );
 
 has 'default_params' => (
     is         => 'ro',
-    isa        => 'HashRef',
-    auto_deref => 1,
+    isa        => HashRef,
     default    => sub { { wt => 'json' } }
 );
 
+around default_params => sub {
+    my ($orig, $self, @args) = @_;
+    my $ret = $self->$orig(@args);
+    return wantarray ? %$ret : $ret;
+};
+
 has 'last_response' => (
     is  => 'rw',
-    isa => 'Maybe[WebService::Solr::Response]',
+    isa => Maybe[InstanceOf['WebService::Solr::Response']],
 );
 
 our $VERSION = '0.23';
@@ -197,9 +204,7 @@ sub _send_update {
     return $self->last_response;
 }
 
-no Any::Moose;
-
-__PACKAGE__->meta->make_immutable;
+no Moo;
 
 1;
 
@@ -262,7 +267,7 @@ listed in the L<ACCESSORS|/"ACCESSORS"> section.
 
 =head2 BUILDARGS( @args )
 
-A Moose override to allow our custom constructor.
+A Moo override to allow our custom constructor.
 
 =head2 add( $doc|\@docs, \%options )
 

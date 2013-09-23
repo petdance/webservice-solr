@@ -19,10 +19,10 @@ has 'raw_response' => (
     },
 );
 
-has 'content' => ( is => 'rw', isa => HashRef, lazy => 1, builder => 1 );
+has 'content' => ( is => 'lazy', isa => HashRef );
 
 has 'docs' =>
-    ( is => 'rw', isa => ArrayRef, lazy => 1, builder => 1 );
+    ( is => 'lazy', isa => ArrayRef );
 
 around docs => sub {
     my ($orig, $self, @args) = @_;
@@ -30,12 +30,12 @@ around docs => sub {
     return wantarray ? @$ret : $ret;
 };
 
-has 'pager' => ( is => 'rw', isa => Maybe[InstanceOf['Data::Page']], lazy => 1, builder => 1 );
+has 'pager' => ( is => 'lazy', isa => Maybe[InstanceOf['Data::Page']] );
 
 has '_pageset_slide' =>
-    ( is => 'rw', isa => Maybe[InstanceOf['Data::Pageset']], lazy => 1, builder => 1, predicate => 1 );
+    ( is => 'rw', isa => Maybe[InstanceOf['Data::Pageset']], predicate => 1 );
 has '_pageset_fixed' =>
-    ( is => 'rw', isa => Maybe[InstanceOf['Data::Pageset']], lazy => 1, builder => 1, predicate => 1 );
+    ( is => 'rw', isa => Maybe[InstanceOf['Data::Pageset']], predicate => 1 );
 
 sub BUILDARGS {
     my ( $self, $res ) = @_;

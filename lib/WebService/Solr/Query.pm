@@ -102,15 +102,16 @@ sub _dispatch_value {
     {
         ### XXX we're assuming that all the next statements MUST
         ### be hashrefs. is this correct?
-        shift @$v;
+        my @v = @$v;
+        shift @v;
         my $op = uc $1;
 
         D
             && $self->___log(
-            "Special operator detected: $op " . Dumper( $v ) );
+            "Special operator detected: $op " . Dumper( \@v ) );
 
         my @clauses;
-        for my $href ( @$v ) {
+        for my $href ( @v ) {
             D
                 && $self->___log( "Dispatch ->_dispatch_struct({ $k, "
                     . Dumper( $href )

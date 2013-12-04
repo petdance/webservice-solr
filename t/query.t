@@ -3,6 +3,7 @@ use Test::More tests => 7;
 use strict;
 use warnings;
 
+use Storable qw(dclone);
 use WebService::Solr::Query;
 
 subtest 'Unescapes' => sub {
@@ -202,7 +203,9 @@ done_testing();
 sub _check {
     my %t = @_;
 
+    my $query = dclone($t{ query });
     my $q = WebService::Solr::Query->new( $t{ query } );
     isa_ok( $q, 'WebService::Solr::Query' );
     is( $q->stringify, $t{ expect }, $t{ expect } );
+    is_deeply($t{ query }, $query, 'query not modified');
 }

@@ -18,6 +18,7 @@ test_requires 'Test::More' => '0.94', # want note(), explain(), subtest() and do
 
 test_requires 'XML::Simple';
 test_requires 'Test::Mock::LWP' => '0.05';
+test_requires 'Storable' => '0.5';
 
 tests_recursive;
 

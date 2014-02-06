@@ -175,6 +175,13 @@ subtest 'Require and prohibit' => sub {
         },
         expect => '((first:"Roger" OR first:"Dodger") AND -title:"star")'
     );
+    _check(
+        query => {
+            first => [ 'Bob' ],
+            title => [ -and => { -prohibit => 'star' }, { -prohibit => 'wars' } ],
+        },
+        expect => '((first:"Bob") AND ((-title:"star") AND (-title:"wars")))'
+    );
 };
 
 subtest 'Nested and/or operators' => sub {

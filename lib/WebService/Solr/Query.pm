@@ -102,6 +102,7 @@ sub _dispatch_value {
     {
         ### XXX we're assuming that all the next statements MUST
         ### be hashrefs. is this correct?
+        $v = [ @$v ]; # Copy the array because we're going to be modifying it.
         shift @$v;
         my $op = uc $1;
 

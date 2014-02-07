@@ -4,6 +4,9 @@ use strict;
 use warnings;
 
 use WebService::Solr::Query;
+use Data::Dumper;
+
+local $Data::Dumper::Sortkeys=1; # To make sure output is deterministic.
 
 subtest 'Unescapes' => sub {
     is( WebService::Solr::Query->escape( '(1+1):2' ),
@@ -177,6 +180,12 @@ subtest 'Require and prohibit' => sub {
     );
     _check(
         query => {
+            title => [ -and => { -prohibit => 'star' }, { -prohibit => 'wars' } ],
+        },
+        expect => '(((-title:"star") AND (-title:"wars")))'
+    );
+    _check(
+        query => {
             first => [ 'Bob' ],
             title => [ -and => { -prohibit => 'star' }, { -prohibit => 'wars' } ],
         },
@@ -207,9 +216,36 @@ subtest 'Nested and/or operators' => sub {
 done_testing();
 
 sub _check {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
     my %t = @_;
 
-    my $q = WebService::Solr::Query->new( $t{ query } );
-    isa_ok( $q, 'WebService::Solr::Query' );
-    is( $q->stringify, $t{ expect }, $t{ expect } );
+    my $expect = $t{expect};
+    return subtest $expect => sub {
+        plan tests => 5;
+        note(explain($t{query}));
+        my $q = WebService::Solr::Query->new( $t{ query } );
+        isa_ok( $q, 'WebService::Solr::Query' );
+
+        # GitHub issue #22 is a bug where calling $q->stringify modified
+        # the query in place, and so subsequent calls to $q->stringify
+        # would blow up.  Here, we try it twice to make sure they match.
+        # Then, we compare the objects before and after.
+
+        my $before_dump = Dumper( $q );
+
+        my @tries;
+        for my $try ( 1..2 ) {
+            eval {
+                my $str = $q->stringify;
+                is( $str, $expect, "Stringify matches on try #$try" );
+                push( @tries, $str );
+            } or fail( "Try #$try fails with $@" );
+        }
+        is( $tries[0], $tries[1], 'Both stringifies are the same' );
+
+        my $after_dump = Dumper( $q );
+
+        is( $after_dump, $before_dump, 'Before/after dumps of the object are the same' );
+    };
 }

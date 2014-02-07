@@ -4,6 +4,7 @@ NEXT
  - Fix a bug in Webservice::Solr::Query::stringify() where it would
    sometimes modify the query argument structure passed in.  This would
    make subsequent calls to stringify be broken and wrong, or even blow up.
+ - The ::Query module no longer loads Data::Dumper automatically.
 
 0.22 2013-04-02 17:03
  - Speed up ->value_for() to lazily find the first field, rather than

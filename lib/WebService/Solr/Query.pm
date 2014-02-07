@@ -9,7 +9,6 @@ my $escape_chars = quotemeta( '+-&|!(){}[]^"~*?:\\' );
 has 'query' => ( is => 'ro', isa => 'ArrayRef', default => sub { [] } );
 
 use constant D => 0;
-use Data::Dumper;
 
 sub BUILDARGS {
     my $class = shift;
@@ -32,7 +31,7 @@ sub _dispatch_struct {
 
     my $method = '_struct_' . ref $struct;
 
-    D && $self->___log( "Dispatching to ->$method " . Dumper $struct );
+    D && $self->___log( "Dispatching to ->$method " . __dumper( $struct ) );
 
     my $rv = $self->$method( $struct );
 
@@ -49,18 +48,18 @@ sub _struct_HASH {
     for my $k ( sort keys %$struct ) {
         my $v = $struct->{ $k };
 
-        D && $self->___log( "Key => $k, value => " . Dumper( $v ) );
+        D && $self->___log( "Key => $k, value => " . __dumper( $v ) );
 
         if ( $k =~ m{^-(.+)} ) {
             my $method = "_op_$1";
 
-            D && $self->___log( "Dispatch ->$method " . Dumper( $v ) );
+            D && $self->___log( "Dispatch ->$method " . __dumper( $v ) );
             push @clauses, $self->$method( $v );
         }
         else {
             D
                 && $self->___log(
-                "Dispatch ->_dispatch_value $k, " . Dumper( $v ) );
+                "Dispatch ->_dispatch_value $k, " . __dumper( $v ) );
             push @clauses, $self->_dispatch_value( $k, $v );
         }
     }
@@ -108,13 +107,13 @@ sub _dispatch_value {
 
         D
             && $self->___log(
-            "Special operator detected: $op " . Dumper( $v ) );
+            "Special operator detected: $op " . __dumper( $v ) );
 
         my @clauses;
         for my $href ( @$v ) {
             D
                 && $self->___log( "Dispatch ->_dispatch_struct({ $k, "
-                    . Dumper( $href )
+                    . __dumper( $href )
                     . '})' );
 
             ### the individual directive ($href) pertains to the key,
@@ -133,7 +132,7 @@ sub _dispatch_value {
     else {
         my $method = '_value_' . ( ref $v || 'SCALAR' );
 
-        D && $self->___log( "Dispatch ->$method $k, " . Dumper( $v ) );
+        D && $self->___log( "Dispatch ->$method $k, " . __dumper( $v ) );
 
         $rv = $self->$method( $k, $v );
     }
@@ -170,7 +169,7 @@ sub _value_HASH {
         my $struct = $v->{ $op };
         $op =~ s{^-(.+)}{_op_$1};
 
-        D && $self->___log( "Dispatch ->$op $k, " . Dumper( $v ) );
+        D && $self->___log( "Dispatch ->$op $k, " . __dumper( $v ) );
 
         push @clauses, $self->$op( $k, $struct );
     }
@@ -269,6 +268,12 @@ sub ___log {
     $msg =~ s/\n/\n#/g;
 
     print "# $who: $msg\n";
+}
+
+sub __dumper {
+    require Data::Dumper;
+
+    return Data::Dumper::Dumper( @_ );
 }
 
 no Any::Moose;
@@ -442,7 +447,7 @@ Jos Boumans E<lt>kane@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2013 National Adult Literacy Database
+Copyright 2008-2014 National Adult Literacy Database
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

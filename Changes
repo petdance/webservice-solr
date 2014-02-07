@@ -1,6 +1,6 @@
 Revision history for Perl extension WebService::Solr.
 
-NEXT
+0.23 2014-02-07 16:58
  - Fix a bug in Webservice::Solr::Query::stringify() where it would
    sometimes modify the query argument structure passed in.  This would
    make subsequent calls to stringify be broken and wrong, or even blow up.

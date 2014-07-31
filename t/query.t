@@ -1,4 +1,4 @@
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 use strict;
 use warnings;
@@ -13,6 +13,16 @@ subtest 'Unescapes' => sub {
         '\(1\+1\)\:2', 'escape' );
     is( WebService::Solr::Query->unescape( '\(1\+1\)\:2' ),
         '(1+1):2', 'unescape' );
+};
+
+subtest 'Select All' => sub {
+    my $string_select_all_via_new = sprintf( "%s", WebService::Solr::Query->new( { '*' => \'*' } ) );
+    is( $string_select_all_via_new, '(*:*)', 'the new method select_all stringifies like this (*:*)' );
+    my $string_select_all = sprintf( "%s", WebService::Solr::Query->select_all() ) ;    
+    is( $string_select_all_via_new, $string_select_all_via_new, 'the select_all method stringifies the same' );  
+    is_deeply(         WebService::Solr::Query->new( { '*' => \'*' } ),
+                WebService::Solr::Query->select_all(),
+                'select_all: The objects returned by both methods are identical' );
 };
 
 subtest 'Basic queries' => sub {

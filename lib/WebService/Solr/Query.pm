@@ -20,6 +20,11 @@ sub BUILDARGS {
     return { query => \@_ };
 }
 
+sub select_all {
+    my $self = shift;
+    return $self->new( { '*' => \'*' } );
+}
+
 sub stringify {
     my $self = shift;
 

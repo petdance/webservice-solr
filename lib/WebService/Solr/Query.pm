@@ -25,6 +25,12 @@ sub select_all {
     return $self->new( { '*' => \'*' } );
 }
 
+sub geofilter {
+    my $self = shift;
+    my( $coordinate, $sfield, $distancekm ) = @_;
+    return qq|\{!geofilt pt=$coordinate sfield=$sfield d=$distancekm\}|;
+}
+
 sub stringify {
     my $self = shift;
 
@@ -425,6 +431,20 @@ B<NB:> Values sent to C<new()> are automatically escaped for you.
 =head2 unescape( $value )
 
 Unescapes values escaped in C<escape()>.
+
+=head2 select_all
+
+A shortcut to generate a query for selecting all records (*:*).
+
+=head2 geofilter 
+
+Generate a geofilter for use in queries. Arguments are a Latitude-Longitude Coordinate in the form 40.76,-73.98, 
+the name of the field in the collection that holds geo-data and a number of kilometers.
+
+ my $fq = WebService::Solr::Query->geofilter( $coordinate $geofield $distance_in_km );
+ 
+
+}
 
 =head2 D
 

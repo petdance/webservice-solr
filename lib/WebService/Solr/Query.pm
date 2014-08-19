@@ -1,12 +1,13 @@
 package WebService::Solr::Query;
 
-use Any::Moose;
+use Moo;
 
 use overload q("") => 'stringify';
 
 my $escape_chars = quotemeta( '+-&|!(){}[]^"~*?:\\' );
 
-has 'query' => ( is => 'ro', isa => 'ArrayRef', default => sub { [] } );
+has 'query' => ( is => 'ro', default => sub { [] } );
+
 
 use constant D => 0;
 
@@ -287,8 +288,6 @@ sub __dumper {
     return Data::Dumper::Dumper( @_ );
 }
 
-no Any::Moose;
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -441,7 +440,7 @@ A shortcut to generate a query for selecting all records (*:*).
 Generate a geofilter for use in queries. Arguments are a Latitude-Longitude Coordinate in the form 40.76,-73.98, 
 the name of the field in the collection that holds geo-data and a number of kilometers.
 
- my $fq = WebService::Solr::Query->geofilter( $coordinate $geofield $distance_in_km );
+ my $fq = WebService::Solr::Query->geofilter( $coordinate, $geofield, $distance_in_km );
  
 
 }

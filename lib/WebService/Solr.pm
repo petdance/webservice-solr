@@ -161,7 +161,7 @@ sub generic_solr_request {
             $self->agent->post(
                 $self->_gen_url( $path ),
                 Content_Type => 'application/x-www-form-urlencoded; charset=utf-8',
-                Content => { $self->default_params, %$params } ) ) );
+                Content => $self->_encode_content( { $self->default_params, %$params } ) ) ) );
 }
 
 sub _gen_url {
@@ -170,6 +170,18 @@ sub _gen_url {
     my $url = $self->url->clone;
     $url->path( $url->path . "/$handler" );
     return $url;
+}
+
+sub _encode_content {
+    my ( $self, $param ) = @_;
+
+    if ( ref $param eq "HASH" ) {
+        return { map { $self->_encode_content($_) } %$param };
+    } elsif ( ref $param eq "ARRAY" ) {
+        return [ map { $self->_encode_content($_) } @$param ];
+    } else {
+        return encode('utf-8', $param);
+    }
 }
 
 sub _send_update {

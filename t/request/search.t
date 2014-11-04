@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 8;
 use Test::Mock::LWP;
 
 use WebService::Solr;
@@ -27,6 +27,15 @@ my ( $expect_path, $expect_params );
     $expect_params = { q => 'foo', wt => 'json' };
     is $solr->last_response, undef, "The last_response attribute hasn't been set yet";
     $solr->search( 'foo' );
+    isa_ok $solr->last_response, 'WebService::Solr::Response';
+
+    $expect_params = {
+        q => "\xc3\x86\xc3\x98\xc3\x85",
+        wt => 'json',
+        fl => 'id',
+        fq => [ 'id:[0 TO 42]', "value:\xc3\x86\xc3\x98\xc3\x85" ]
+    };
+    $solr->search( "\xc6\xd8\xc5", { fl => 'id', fq => [ 'id:[0 TO 42]', "value:\xc6\xd8\xc5" ] } );
     isa_ok $solr->last_response, 'WebService::Solr::Response';
 }
 

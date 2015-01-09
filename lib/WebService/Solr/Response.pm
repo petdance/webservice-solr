@@ -25,6 +25,8 @@ has 'docs' =>
 
 has 'pager' => ( is => 'rw', isa => 'Maybe[Data::Page]', lazy_build => 1 );
 
+has 'stats' => ( is => 'rw', isa => 'Maybe[HashRef]', lazy_build => 1 );
+
 has '_pageset_slide' =>
     ( is => 'rw', isa => 'Maybe[Data::Pageset]', lazy_build => 1 );
 has '_pageset_fixed' =>
@@ -119,6 +121,13 @@ sub _build_pageset {
     return $pager;
 }
 
+sub _build_stats {
+    my $self = shift;
+    my $struct = $self->content;
+
+    return $struct->{stats};
+}
+
 sub facet_counts {
     return shift->content->{ facet_counts };
 }
@@ -175,6 +184,8 @@ all responses from the service.
 =item * pager - a L<Data::Page> object for the search results.
 
 =item * pageset - a L<Data::Pageset> object for the search results. Takes the same arguments as C<< Data::Pageset->new >> does. All arguments optional.
+
+=item * stats - a hashref of the SOLR statistics data if requested. (See http://wiki.apache.org/solr/StatsComponent )
 
 =back
 

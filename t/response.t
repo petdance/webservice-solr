@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 ### XXX Whitebox tests!
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 use HTTP::Headers;
 use HTTP::Response;
@@ -15,7 +15,7 @@ my $Class = 'WebService::Solr::Response';
 my $SolrResponse = HTTP::Response->new(
     200 => 'OK',
     HTTP::Headers->new,
-    q[{"responseHeader":{"status":0,"QTime":24,"params":{"rows":"2","sort":"created_dt desc","wt":"json","start":"4","q":"foo"}},"response":{"numFound":10,"start":4,"docs":[{"name":["foo1"]},{"name":["foo2"]}]}}],
+    q[{"stats":{"stats_fields":{"foo1":{"min":1,"max":9}}},"responseHeader":{"status":0,"QTime":24,"params":{"rows":"2","sort":"created_dt desc","wt":"json","start":"4","q":"foo"}},"response":{"numFound":10,"start":4,"docs":[{"name":["foo1"]},{"name":["foo2"]}]}}],
 );
 
 my $Obj;
@@ -59,6 +59,12 @@ subtest 'Check pagers' => sub {
         is( $pager->first_page,       1,  "   First page = 1" );
         is( $pager->last_page,        5,  "   Last page = 5" );
         is( $pager->current_page,     3,  "   Current page = 2" );
+    }
+};
+
+subtest 'Check statistics' => sub {
+    for my $stats ( $Obj->stats ) {
+        is_deeply $stats, { stats_fields => { foo1 => { min => 1, max => 9 } } };
     }
 };
 

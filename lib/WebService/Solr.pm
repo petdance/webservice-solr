@@ -329,6 +329,9 @@ and a copyright year of 2011 or 2012:
 The filter queries are typically added when drilling down into search
 results and selecting a facet to drill into.
 
+In order to enable facets, the option C<facet =E<gt> "on"> must be passed.
+Facet options are detailed in the wiki (https://wiki.apache.org/solr/SimpleFacetParameters).
+
 =head2 auto_suggest( \%options )
 
 Get suggestions from a list of terms for a given field. The Solr wiki has

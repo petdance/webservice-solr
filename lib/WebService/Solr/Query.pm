@@ -1,12 +1,14 @@
 package WebService::Solr::Query;
 
-use Any::Moose;
+use Moo;
+
+use Types::Standard qw(ArrayRef);
 
 use overload q("") => 'stringify';
 
 my $escape_chars = quotemeta( '+-&|!(){}[]^"~*?:\\' );
 
-has 'query' => ( is => 'ro', isa => 'ArrayRef', default => sub { [] } );
+has 'query' => ( is => 'ro', isa => ArrayRef, default => sub { [] } );
 
 use constant D => 0;
 
@@ -276,9 +278,7 @@ sub __dumper {
     return Data::Dumper::Dumper( @_ );
 }
 
-no Any::Moose;
-
-__PACKAGE__->meta->make_immutable;
+no Moo;
 
 1;
 
@@ -427,7 +427,7 @@ Debugging constant, default: off.
 
 =head2 BUILDARGS
 
-Moose method to handle input to C<new()>.
+Moo method to handle input to C<new()>.
 
 =head1 SEE ALSO
 

@@ -93,7 +93,7 @@ Creates a new field object. Currently, the only option available is a
 
 =head2 BUILDARGS( @args )
 
-A Moose override to allow our custom constructor.
+A Moo override to allow our custom constructor.
 
 =head2 to_element( )
 

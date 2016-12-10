@@ -1,5 +1,9 @@
 Revision history for Perl extension WebService::Solr.
 
+NEXT
+ - Switch from the deprecated Any::Moose to Moo + Types::Standard.
+   Thanks, ilmari.
+
 0.23 2014-02-07 16:58
  - Fix a bug in Webservice::Solr::Query::stringify() where it would
    sometimes modify the query argument structure passed in.  This would

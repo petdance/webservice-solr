@@ -11,7 +11,8 @@ requires 'Data::Page';
 requires 'Data::Pageset';
 requires 'XML::Easy';
 requires 'JSON::XS';
-requires 'Any::Moose' => '0.16'; # 0.16 doesn't force Mouse dep
+requires 'Moo';
+requires 'Types::Standard' => '0.008'; # InstanceOf type constraint
 requires 'Encode';
 
 test_requires 'Test::More' => '0.94', # want note(), explain(), subtest() and done_testing()

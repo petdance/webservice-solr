@@ -1,6 +1,6 @@
 Revision history for Perl extension WebService::Solr.
 
-NEXT
+0.24_01 Fri Dec  9 22:45:03 CST 2016 *DEVELOPER RELEASE*
  - Switch from the deprecated Any::Moose to Moo + Types::Standard.
    Thanks, ilmari.
 

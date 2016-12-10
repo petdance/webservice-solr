@@ -1,4 +1,4 @@
-use Test::More tests => 7;
+use Test::More tests => 9;
 
 use strict;
 use warnings;
@@ -14,6 +14,23 @@ subtest 'Unescapes' => sub {
     is( WebService::Solr::Query->unescape( '\(1\+1\)\:2' ),
         '(1+1):2', 'unescape' );
 };
+
+subtest 'Select All' => sub {
+    my $string_select_all_via_new = sprintf( "%s", WebService::Solr::Query->new( { '*' => \'*' } ) );
+    is( $string_select_all_via_new, '(*:*)', q|selecting all via ->new( { '*' => \'*' } ) stringifies like this (*:*)| );
+    my $string_select_all = sprintf( "%s", WebService::Solr::Query->select_all() ) ;    
+    is( $string_select_all_via_new, $string_select_all_via_new, 'the select_all method stringifies the same' );  
+    is_deeply(         WebService::Solr::Query->new( { '*' => \'*' } ),
+                WebService::Solr::Query->select_all(),
+                'select_all: The objects returned by both methods are identical' );
+};
+
+subtest 'GeoFilter' => sub {
+    my $carnegiehall = '40.76,-73.98' ;
+    my $carnegie400 = WebService::Solr::Query->geofilter( $carnegiehall, 'store', 400 );
+    is( $carnegie400, '{!geofilt pt=40.76,-73.98 sfield=store d=400}', 
+        'Returned string for filter query for store within 400 km of Carnegie Hall' ) ;   
+    };
 
 subtest 'Basic queries' => sub {
     # default field

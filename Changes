@@ -1,8 +1,18 @@
 Revision history for Perl extension WebService::Solr.
 
+
+0.40    Wed Dec 11 21:32:17 CST 2017
+ - No functionality changes.
+ - New maintainer: Andy Lester
+ - Big jump in version number to show a new numbering scheme.
+
 0.24_01 Fri Dec  9 22:45:03 CST 2016 *DEVELOPER RELEASE*
  - Switch from the deprecated Any::Moose to Moo + Types::Standard.
    Thanks, ilmari.
+
+
+# Before this point, Brian Cassidy was the maintainer.  The version
+numbering scheme was different from what it is now.
 
 0.23 2014-02-07 16:58
  - Fix a bug in Webservice::Solr::Query::stringify() where it would

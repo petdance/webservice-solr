@@ -13,6 +13,7 @@ use HTTP::Headers;
 use XML::Easy::Element;
 use XML::Easy::Content;
 use XML::Easy::Text ();
+use Carp qw(confess);
 
 has 'url' => (
     is      => 'ro',
@@ -194,7 +195,7 @@ sub _send_update {
 
     my $http_response = $self->agent->request( $req );
     if ( $http_response->is_error ) {
-        confess $http_response->status_line . ': ' . $http_response->content;
+        confess($http_response->status_line . ': ' . $http_response->content);
     }
 
     $self->last_response( WebService::Solr::Response->new( $http_response ) );

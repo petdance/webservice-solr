@@ -1,7 +1,7 @@
 Revision history for Perl extension WebService::Solr.
 
 
-NEXT
+0.41_01 Wed Apr 19 17:21:29 CDT 2017
  - No functionality changes.
  - Added a missing Carp.  Thanks, Luke Closs.
  - Stopped using Module::Install and switched to ExtUtils::MakeMaker

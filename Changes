@@ -1,5 +1,7 @@
 Revision history for Perl extension WebService::Solr.
 
+0.42    Tue Apr 25 16:59:02 CDT 2017
+ - No changes since 0.41_01
 
 0.41_01 Wed Apr 19 17:21:29 CDT 2017
  - No functionality changes.

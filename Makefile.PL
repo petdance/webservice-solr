@@ -16,7 +16,7 @@ my %parms = (
     META_MERGE          => {
         resources => {
             homepage    => 'https://github.com/petdance/webservice-solr',
-            bugtracker  => 'https://github.com/petdance/ack3',
+            bugtracker  => 'https://github.com/petdance/webservice-solr/issues',
             repository  => 'git@github.com:petdance/webservice-solr.git',
         },
     },

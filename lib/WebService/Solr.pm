@@ -250,6 +250,8 @@ enterprise-grade indexing and searching platform.
 
 =item * last_response - stores a WebService::Solr::Response for the last request
 
+=item * PP - a boolean value for using JSON::PP instead of the default JSON::XS for parsing Solr responses (default: disabled)
+
 =back
 
 =head1 HTTP KEEP-ALIVE

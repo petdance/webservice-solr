@@ -15,6 +15,12 @@ use XML::Easy::Content;
 use XML::Easy::Text ();
 use Carp qw(confess);
 
+has 'PP' => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 0
+);
+
 has 'url' => (
     is      => 'ro',
     isa     => InstanceOf['URI'],
@@ -198,7 +204,7 @@ sub _send_update {
         confess($http_response->status_line . ': ' . $http_response->content);
     }
 
-    $self->last_response( WebService::Solr::Response->new( $http_response ) );
+    $self->last_response( WebService::Solr::Response->new( $http_response, (PP=>$self->{PP}) ) );
 
     $self->commit if $autocommit;
 

@@ -2,7 +2,7 @@ package WebService::Solr::Response;
 
 use Moo;
 
-use Types::Standard qw(Object HashRef Maybe InstanceOf ArrayRef);
+use Types::Standard qw(Object HashRef Maybe InstanceOf ArrayRef Bool);
 use WebService::Solr::Document;
 use Data::Page;
 use Data::Pageset;
@@ -45,14 +45,15 @@ has '_pageset_fixed' =>
     ( is => 'rw', isa => Maybe[InstanceOf['Data::Pageset']], predicate => 1 );
 
 sub BUILDARGS {
-    my ( $self, $res ) = @_;
-    return { raw_response => $res };
+    my ( $self, $res, %options ) = @_;
+    return { raw_response => $res, %options };
 }
 
 sub _build_content {
     my $self    = shift;
     my $content = $self->raw_response->content;
     return {} unless $content;
+die;
     my $rv;
     if($self->{PP})
     { $rv = eval { JSON::PP::decode_json( $content ) }; }

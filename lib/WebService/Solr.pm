@@ -99,6 +99,7 @@ sub update {
 sub commit {
     my ( $self, $params ) = @_;
     $params ||= {};
+
     my $e        = XML::Easy::Element->new( 'commit', $params, [ '' ] );
     my $xml      = XML::Easy::Text::xml10_write_element( $e );
     my $response = $self->_send_update( $xml, {}, 0 );

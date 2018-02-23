@@ -53,7 +53,6 @@ sub _build_content {
     my $self    = shift;
     my $content = $self->raw_response->content;
     return {} unless $content;
-die;
     my $rv;
     if($self->{PP})
     { $rv = eval { JSON::PP::decode_json( $content ) }; }

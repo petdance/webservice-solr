@@ -1,4 +1,4 @@
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 use strict;
 use warnings;
@@ -210,6 +210,29 @@ subtest 'Nested and/or operators' => sub {
             ],
         },
         expect => q[(((title:{a TO c}) OR (title:{e TO k})))],
+    );
+};
+
+subtest 'Nesting ranges in require/prohibit' => sub {
+    _check(
+        query => { title => undef },
+        expect => q[(-title:[* TO *])],
+    );
+
+    _check(
+        query => {
+            foo => { -prohibit => [qw( * * )] },
+            bar => { -prohibit => { -range => [qw( * * )] } },
+        },
+        expect => q{(-bar:[* TO *] AND -(foo:"\*" OR foo:"\*"))},
+    );
+
+    _check(
+        query => {
+            foo => { -require => [qw( * * )] },
+            bar => { -require => { -range => [qw( * * )] } },
+        },
+        expect => q{(+bar:[* TO *] AND +(foo:"\*" OR foo:"\*"))},
     );
 };
 

@@ -129,6 +129,9 @@ sub _dispatch_value {
 
         $rv = '(' . join( " $op ", @clauses ) . ')';
 
+    }
+    elsif ( ! defined $v ) {
+        $rv = $self->_value_HASH( $k, { -prohibit => { -range => [qw( * * )] } } );
         ### nothing special about this combo, so do a usual dispatch
     }
     else {
@@ -236,14 +239,26 @@ sub _op_proximity {
 
 sub _op_require {
     my ( $self, $k, $v ) = @_;
-    $v = $self->escape( $v );
-    return qq(+$k:"$v");
+    if (my $ref = ref $v) {
+        my $method = "_value_$ref";
+        return '+' . $self->$method($k, $v);
+    }
+    else {
+        $v = $self->escape( $v );
+        return qq(+$k:"$v");
+    }
 }
 
 sub _op_prohibit {
     my ( $self, $k, $v ) = @_;
-    $v = $self->escape( $v );
-    return qq(-$k:"$v");
+    if (my $ref = ref $v) {
+        my $method = "_value_$ref";
+        return '-' . $self->$method($k, $v);
+    }
+    else {
+        $v = $self->escape( $v );
+        return qq(-$k:"$v");
+    }
 }
 
 sub escape {
@@ -353,6 +368,23 @@ To search the default field, use the C<-default> prefix.
     
     my $q = WebService::Solr::Query->new( { foo => { -prohibit => 'bar' } } );
     # RESULT: (-foo:"bar")
+
+These operators can take a nested range to specify queries that
+require or prohibit values in those ranges:
+
+    my $q = WebService::Solr::Query->new( { foo => { -require => { -range => [ 1, 10 ] } } } );
+    # RESULT: (+foo:[1 TO 10])
+
+    my $q = WebService::Solr::Query->new( { foo => { -prohibit => { -range => [qw( * * )] } } } );
+    # RESULT: (-foo:[* TO *])
+
+The latter query can be used to match rows that do not have a value
+defined for the specified field. Since this is equivalent to looking
+for undefined values, the same syntax from SQL::Abstract can be used
+as shorthand for this effect:
+
+    my $q = WebService::Solr::Query->new( { foo => undef } );
+    # RESULT: (-foo:[* TO *])
 
 =head2 Range
 

@@ -76,10 +76,22 @@ sub _struct_HASH {
 sub _struct_ARRAY {
     my ( $self, $struct ) = @_;
 
-    my $rv
-        = '('
-        . join( " OR ", map { $self->_dispatch_struct( $_ ) } @$struct )
-        . ')';
+    my @clauses;
+    my $elems = [ @$struct ];
+
+    while (@$elems) {
+        my $k = shift @$elems;
+        if (my $ref = ref $k) {
+            my $method = '_struct_' . $ref;
+            push @clauses, $self->$method($k);
+        }
+        else {
+            my $v = shift @$elems;
+            push @clauses, $self->_dispatch_value( $k, $v );
+        }
+    }
+
+    my $rv = '(' . join( ' OR ', @clauses ) . ')';
 
     D && $self->___log( "Returning: $rv" );
 
@@ -90,53 +102,59 @@ sub _dispatch_value {
     my ( $self, $k, $v ) = @_;
 
     my $rv;
-    ### it's an array ref, the first element MAY be an operator!
-    ### it would look something like this:
-    # [ '-and',
-    #   { '-require' => 'star' },
-    #   { '-require' => 'wars' }
-    # ];
-    if (    ref $v
-        and UNIVERSAL::isa( $v, 'ARRAY' )
-        and defined $v->[ 0 ]
-        and $v->[ 0 ] =~ /^ - ( AND|OR ) $/ix )
-    {
-        ### XXX we're assuming that all the next statements MUST
-        ### be hashrefs. is this correct?
-        $v = [ @$v ]; # Copy the array because we're going to be modifying it.
-        shift @$v;
-        my $op = uc $1;
 
-        D
-            && $self->___log(
-            "Special operator detected: $op " . __dumper( $v ) );
+    if (my $ref = ref $v) {
+        if ( UNIVERSAL::isa( $v, 'ARRAY' )
+            and defined $v->[ 0 ]
+            and $v->[ 0 ] =~ /^ - ( AND|OR ) $/ix )
+        {
+            ### it's an array ref, the first element MAY be an operator!
+            ### it would look something like this:
+            # [ '-and',
+            #   { '-require' => 'star' },
+            #   { '-require' => 'wars' }
+            # ];
+            ### XXX we're assuming that all the next statements MUST
+            ### be hashrefs. is this correct?
+            $v = [ @$v ]; # Copy the array because we're going to be modifying it.
+            shift @$v;
+            my $op = uc $1;
 
-        my @clauses;
-        for my $href ( @$v ) {
             D
-                && $self->___log( "Dispatch ->_dispatch_struct({ $k, "
-                    . __dumper( $href )
-                    . '})' );
+                && $self->___log(
+                "Special operator detected: $op " . __dumper( $v ) );
 
-            ### the individual directive ($href) pertains to the key,
-            ### so we should send that along.
-            my $part = $self->_dispatch_struct( { $k => $href } );
+            my @clauses;
+            for my $href ( @$v ) {
+                D
+                    && $self->___log( "Dispatch ->_dispatch_struct({ $k, "
+                        . __dumper( $href )
+                        . '})' );
 
-            D && $self->___log( "Returned $part" );
+                ### the individual directive ($href) pertains to the key,
+                ### so we should send that along.
+                my $part = $self->_dispatch_struct( { $k => $href } );
 
-            push @clauses, '(' . $part . ')';
+                D && $self->___log( "Returned $part" );
+
+                push @clauses, '(' . $part . ')';
+            }
+
+            $rv = '(' . join( " $op ", @clauses ) . ')';
         }
+        else {
+            my $method = '_value_' . $ref;
 
-        $rv = '(' . join( " $op ", @clauses ) . ')';
+            D && $self->___log( "Dispatch ->$method $k, " . __dumper( $v ) );
 
-        ### nothing special about this combo, so do a usual dispatch
+            $rv = $self->$method( $k, $v );
+        }
     }
     else {
-        my $method = '_value_' . ( ref $v || 'SCALAR' );
 
-        D && $self->___log( "Dispatch ->$method $k, " . __dumper( $v ) );
+        D && $self->___log( "Dispatch ->_value_SCALAR $k, " . __dumper( $v ) );
 
-        $rv = $self->$method( $k, $v );
+        $rv = $self->_value_SCALAR( $k, $v );
     }
 
     D && $self->___log( "Returning: $rv" );
@@ -187,7 +205,7 @@ sub _value_ARRAY {
     my ( $self, $k, $v ) = @_;
 
     my $rv = '('
-        . join( ' OR ', map { $self->_value_SCALAR( $k, $_ ) } @$v ) . ')';
+        . join( ' OR ', map { $self->_dispatch_value( $k, $_ ) } @$v ) . ')';
 
     D && $self->___log( "Returning: $rv" );
 

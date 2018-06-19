@@ -1,4 +1,4 @@
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 use strict;
 use warnings;
@@ -46,6 +46,10 @@ subtest 'Basic queries' => sub {
     _check(
         query => [ { first => [ 'Roger', 'Dodger' ] }, { last => 'Moore' } ],
         expect => '((first:"Roger" OR first:"Dodger") OR last:"Moore")'
+    );
+    _check(
+        query => [ first => 'Roger', last => 'Moore' ],
+        expect => '(first:"Roger" OR last:"Moore")'
     );
 
     _check(
@@ -210,6 +214,18 @@ subtest 'Nested and/or operators' => sub {
             ],
         },
         expect => q[(((title:{a TO c}) OR (title:{e TO k})))],
+    );
+};
+
+subtest 'Nesting arrays' => sub {
+    _check(
+        query => [ foo => { -prohibit => "bar" }, foo => { -range => [ 1, 10 ] } ],
+        expect => q{(-foo:"bar" OR foo:[1 TO 10])},
+    );
+
+    _check(
+        query => { foo => [ [ 'bar', 'baz' ], [ 'car', 'caz' ] ] },
+        expect => q{(((foo:"bar" OR foo:"baz") OR (foo:"car" OR foo:"caz")))},
     );
 };
 

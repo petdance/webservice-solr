@@ -19,7 +19,8 @@ has 'raw_response' => (
     },
 );
 
-has 'content' => ( is => 'lazy', isa => HashRef );
+has 'content' =>
+    ( is => 'lazy', isa => HashRef );
 
 has 'docs' =>
     ( is => 'lazy', isa => ArrayRef );
@@ -30,12 +31,17 @@ around docs => sub {
     return wantarray ? @$ret : $ret;
 };
 
-has 'pager' => ( is => 'lazy', isa => Maybe[InstanceOf['Data::Page']] );
+has 'pager' =>
+    ( is => 'lazy', isa => Maybe[InstanceOf['Data::Page']] );
 
 has '_pageset_slide' =>
     ( is => 'rw', isa => Maybe[InstanceOf['Data::Pageset']], predicate => 1 );
+
 has '_pageset_fixed' =>
     ( is => 'rw', isa => Maybe[InstanceOf['Data::Pageset']], predicate => 1 );
+
+has 'params' =>
+    ( is => 'lazy', isa => HashRef );
 
 sub BUILDARGS {
     my ( $self, $res ) = @_;
@@ -126,6 +132,68 @@ sub _build_pageset {
     return $pager;
 }
 
+sub _build_params {
+    return shift->content->{ responseHeader }->{ params };
+}
+
+sub grouped_docs {
+    my $self = shift;
+
+    return [] unless $self->is_grouped;
+
+    my $params = $self->params;
+
+    # Solr documentation says it uses the first group.field for
+    # group.facet when multiple values are given so let's get that one
+    my $group_field = shift || (
+        ref $params->{ 'group.field' } eq 'Array'
+        ? $params->{ 'group.field' }->[0]
+        : $params->{ 'group.field' }
+    );
+
+    # Solr has three result formats for 'group=true' results depending
+    # on other group parameters passed:
+    # group.format  group.main  response format
+    # ------------  ----------  ---------------
+    # simple        false       content->{grouped}->{<group.field>}->{doclist}->{docs}->[]
+    # grouped       false       content->{grouped}->{<group.field>}->{groups}->[ {doclist}->{docs}->[] ]
+    #    *          true        content->{response}->{docs}->[]
+
+    my $group_main = $params->{ 'group.main' } // 'false';
+    my $group_format = $group_main eq 'true'
+        ? 'simple'
+        : $params->{ 'group.format' } // 'grouped';
+
+    my $docs = [];
+    if ( $group_main eq 'true' ) {
+        $docs = $self->content->{ response }->{ docs };
+    }
+    else {
+        my $struct = $self->groups($group_field);
+        if ( $group_format eq 'simple' ) {
+            $docs = $struct->{ doclist }->{ docs };
+        }
+        else {
+            foreach my $group (@{$struct->{ groups }}) {
+                map { push @$docs, $_ } @{ $group->{ doclist }->{ docs } };
+            }
+        }
+    }
+
+    my $ret = [ map { WebService::Solr::Document->new( %$_ ) } @$docs ];
+    return wantarray ? @$ret : $ret;
+}
+
+sub groups {
+    return defined $_[1]
+        ? $_[0]->content->{ grouped }{ $_[1] }
+        : $_[0]->content->{ grouped };
+}
+
+sub is_grouped {
+    return (shift->params->{ 'group' } || '') eq 'true';
+}
+
 sub facet_counts {
     return shift->content->{ facet_counts };
 }
@@ -177,6 +245,8 @@ all responses from the service.
 
 =item * docs - an array of L<WebService::Solr::Document> objects.
 
+=item * params - a hashref of explict parameters passed to the Solr request.
+
 =item * pager - a L<Data::Page> object for the search results.
 
 =item * pageset - a L<Data::Pageset> object for the search results. Takes the same arguments as C<< Data::Pageset->new >> does. All arguments optional.
@@ -197,6 +267,18 @@ A Moo override to allow our custom constructor.
 =head2 facet_counts( )
 
 A shortcut to the C<facet_counts> key in the response data.
+
+=head2 is_grouped( )
+
+Check if request parameter C<group> was set to true.
+
+=head2 grouped_docs( [I<group_field>] )
+
+The Solr results structure can differ greatly when using Result Grouping in search. Returns an array of L<WebService::Solr::Document> objects if grouped results were requested.  Documents are from the I<group_field> value. Otherwise, the first passed group.field Solr parameter value will be used.  The complete structure can always be retrieved via L<content> accessor.
+
+=head2 groups( [I<group_field>] )
+
+If Solr Result Grouping is used, data from the response is returned of the I<group_field> value in groups or all groups are returned.
 
 =head2 spellcheck( )
 

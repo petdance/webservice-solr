@@ -29,7 +29,7 @@ has 'autocommit' => ( is => 'ro', isa => Bool, default => 1 );
 has 'default_params' => (
     is         => 'ro',
     isa        => HashRef,
-    default    => sub { { wt => 'json' } }
+    default    => sub { { wt => 'json', echoParams => 'explicit' } }
 );
 
 around default_params => sub {
@@ -43,7 +43,7 @@ has 'last_response' => (
     isa => Maybe[InstanceOf['WebService::Solr::Response']],
 );
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 sub BUILDARGS {
     my ( $self, $url, $options ) = @_;

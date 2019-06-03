@@ -157,6 +157,17 @@ sub search {
     return $self->generic_solr_request( 'select', $params );
 }
 
+sub schema {
+  my $self = shift;
+  my $url = $self->_gen_url( 'schema' );
+
+  my $resp = $self->last_response(
+    WebService::Solr::Response->new(
+      $self->agent->get($url)));
+
+  return $resp->is_success ? $resp->content->{schema} : ();
+}
+
 sub auto_suggest {
     shift->generic_solr_request( 'autoSuggest', @_ );
 }
@@ -380,6 +391,10 @@ Options as of Solr 1.4 are the same as C<commit()>.
 =head2 ping( )
 
 Sends a basic ping request. Returns true on success, false otherwise.
+
+=head2 schema
+
+Fetch the schema of the collection.
 
 =head2 generic_solr_request( $path, \%query )
 

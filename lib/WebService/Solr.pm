@@ -204,6 +204,12 @@ sub edit_schema {
             my $tmp = [ map {; ref ? $_ : +{ name => $_ } } @$params ];
             push @json, '"delete-field-type":' . $j->encode($tmp);
         }
+        elsif ($action =~ /^add[-_]?copy(?:[-_]?field)?$/) {
+            push @json, '"add-copy-field":' . $j->encode($params);
+        }
+        elsif ($action =~ /^delete[-_]?copy(?:[-_]?field)?$/) {
+            push @json, '"delete-copy-field":' . $j->encode($params);
+        }
         else {
             confess "Unknown action $action";
         }

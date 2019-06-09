@@ -54,6 +54,27 @@ SKIP:
     ok($solr->edit_schema([ delete_type => { name => $t1 } ]),
        "and delete the type")
       or diag Dumper($solr->last_response->content);
+
+    ok($solr->edit_schema([ add_field =>
+			      [
+				  +{ name => $f1, type => $textt1->{name} },
+                                  +{ name => $f2, type => $textt1->{name} },
+				  +{ name => $f3, type => $textt2->{name} },
+			      ]
+			  ]),
+       "add multiple fields");
+
+    ok($solr->edit_schema([ replace_field => { name => $f2, type => $textt2->{name} } ]),
+       "replace a field");
+
+    ok($solr->edit_schema([ add_copy => { source => $f1, dest => [ $f2, $f3 ] } ]),
+       "add copy fields");
+
+    ok($solr->edit_schema([ delete_copy => { source => $f1, dest => [ $f2, $f3 ] } ]),
+       "delete the copy fields");
+
+    ok($solr->edit_schema([ delete_field => [ $f1, $f2, $f3 ] ]),
+       "delete multiple fields");
 }
 
 done_testing();

@@ -22,4 +22,23 @@ is(ref $schema->{copyFields}, 'ARRAY', 'got a copyFields array');
 is(ref $schema->{dynamicFields}, 'ARRAY', 'got a dynamicFields array');
 ok(!ref $schema->{uniqueKey}, "uniqueKey isn't an array");
 
+SKIP:
+{
+    $ENV{SOLR_TEST_SCHEMA_EDITS}
+      or skip "Set SOLR_TEST_SCHEMA_EDITS=1 to test schema changes - maybe destructive", 1;
+    my $f1 = "testf" . time() . "_" . int(rand(10000));
+    my $f2 = $f1 . "a";
+    my $f3 = $f1 . "b";
+    my $t1 = "testt" . time() . "_" . int(rand(10000));
+
+    # clone some text field
+    my ($textt1, $textt2) = grep $_->{name} =~ /^text/, @{$schema->{fieldTypes}};
+
+    ok($solr->edit_schema([ addfield => { name => $f1, type => $textt1->{name} } ]),
+       "add a field");
+    ok($solr->edit_schema([ deletefield => { name => $f1 } ]),
+       "delete it again");
+    my %mydef = ( %$textt1, name => $t1 );
+}
+
 done_testing();

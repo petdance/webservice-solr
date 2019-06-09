@@ -168,6 +168,52 @@ sub schema {
   return $resp->is_success ? $resp->content->{schema} : ();
 }
 
+sub edit_schema {
+    my $self = shift;
+    my $actions = shift
+      or confess 'Usage: edit_schema(\@actions)';
+    my $i = 0;
+
+    # horribly, Solr likes multiple keys with the same name in its
+    # json objects
+    my @json;
+    my $j = JSON::XS->new;
+    while ($i < @$actions) {
+        my ($action, $params) = @$actions[$i, $i+1];
+
+        $params = [ $params ] if ref $params ne 'ARRAY';
+
+        if ($action =~ /^add[-_]?field$/) {
+            push @json, '"add-field":' . $j->encode($params);
+        }
+        elsif ($action =~ /^replace[-_]?field$/) {
+            push @json, '"replace-field":' . $j->encode($params);
+        }
+        elsif ($action =~ /^delete[-_]?field$/) {
+            # treat simple scalars as field names
+            my $tmp = [ map {; ref ? $_ : +{ name => $_ } } @$params ];
+            push @json, '"delete-field":' . $j->encode($tmp);
+        }
+        else {
+            confess "Unknown action $action";
+        }
+
+        $i += 2;
+    }
+    # We need to build our JSON here to ensure that changes are done in the requested
+    # order, since Solr seems to allow duplicate keys and preservation of ordering
+    # in its JSON.
+    # I'd use XML, but the schema API doesn't appear to support it.
+    my $json = '{' . join(",", @json) . '}';
+
+    return $self->last_response(
+        WebService::Solr::Response->new(
+            $self->agent->post(
+                $self->_gen_url( 'schema' ),
+                Content_Type => 'application/json',
+                Content => $json ) ) )->is_success();
+}
+
 sub auto_suggest {
     shift->generic_solr_request( 'autoSuggest', @_ );
 }
@@ -395,6 +441,10 @@ Sends a basic ping request. Returns true on success, false otherwise.
 =head2 schema
 
 Fetch the schema of the collection.
+
+=head2 edit_schema
+
+Batch edits to the schema (if the core is using a managed schema).
 
 =head2 generic_solr_request( $path, \%query )
 

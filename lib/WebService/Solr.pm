@@ -194,6 +194,16 @@ sub edit_schema {
             my $tmp = [ map {; ref ? $_ : +{ name => $_ } } @$params ];
             push @json, '"delete-field":' . $j->encode($tmp);
         }
+        elsif ($action =~ /^add[-_]?(?:field[-_]?)?type$/) {
+            push @json, '"add-field-type":' . $j->encode($params);
+        }
+        elsif ($action =~ /^replace[-_]?(?:field[-_]?)?type$/) {
+            push @json, '"replace-field-type":' . $j->encode($params);
+        }
+        elsif ($action =~ /^delete[-_]?(?:field[-_]?)?type$/) {
+            my $tmp = [ map {; ref ? $_ : +{ name => $_ } } @$params ];
+            push @json, '"delete-field-type":' . $j->encode($tmp);
+        }
         else {
             confess "Unknown action $action";
         }

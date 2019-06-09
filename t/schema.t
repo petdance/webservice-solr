@@ -39,6 +39,21 @@ SKIP:
     ok($solr->edit_schema([ deletefield => { name => $f1 } ]),
        "delete it again");
     my %mydef = ( %$textt1, name => $t1 );
+    use Data::Dumper;
+    ok($solr->edit_schema([ add_type => \%mydef ]),
+       "create a field type")
+      or diag Dumper($solr->last_response->content);
+    %mydef = ( %$textt2, name => $t1 );
+    ok($solr->edit_schema([ replace_type => \%mydef ]),
+       "replace a field type")
+      or diag Dumper($solr->last_response->content);
+    ok($solr->edit_schema([ add_field => { name => $f1, type => $t1 } ]),
+       "add field with the new type");
+    ok($solr->edit_schema([ delete_field => { name => $f1 } ]),
+       "add field with the new type");
+    ok($solr->edit_schema([ delete_type => { name => $t1 } ]),
+       "and delete the type")
+      or diag Dumper($solr->last_response->content);
 }
 
 done_testing();

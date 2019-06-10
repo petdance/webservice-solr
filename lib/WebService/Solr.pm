@@ -194,6 +194,17 @@ sub edit_schema {
             my $tmp = [ map {; ref ? $_ : +{ name => $_ } } @$params ];
             push @json, '"delete-field":' . $j->encode($tmp);
         }
+        elsif ($action =~ /^add[-_]?dynamic(?:[-_]?field)?$/) {
+            push @json, '"add-dynamic-field":' . $j->encode($params);
+        }
+        elsif ($action =~ /^replace[-_]?dynamic(?:[-_]?field)?$/) {
+            push @json, '"replace-dynamic-field":' . $j->encode($params);
+        }
+        elsif ($action =~ /^delete[-_]?dynamic(?:[-_]?field)?$/) {
+            # treat simple scalars as field names
+            my $tmp = [ map {; ref ? $_ : +{ name => $_ } } @$params ];
+            push @json, '"delete-dynamic-field":' . $j->encode($tmp);
+        }
         elsif ($action =~ /^add[-_]?(?:field[-_]?)?type$/) {
             push @json, '"add-field-type":' . $j->encode($params);
         }

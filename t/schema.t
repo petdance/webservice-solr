@@ -29,6 +29,7 @@ SKIP:
     my $f1 = "testf" . time() . "_" . int(rand(10000));
     my $f2 = $f1 . "a";
     my $f3 = $f1 . "b";
+    my $d1 = "*_$f1";
     my $t1 = "testt" . time() . "_" . int(rand(10000));
 
     # clone some text field
@@ -75,6 +76,14 @@ SKIP:
 
     ok($solr->edit_schema([ delete_field => [ $f1, $f2, $f3 ] ]),
        "delete multiple fields");
+
+    ok($solr->edit_schema([ add_dynamic_field => { name => $d1, type => $textt1->{name} } ]),
+       "add dynamic field");
+
+    ok($solr->edit_schema([ replace_dynamic_field => { name => $d1, type => $textt2->{name} } ]),
+       "replace dynamic field");
+    ok($solr->edit_schema([ delete_dynamic_field => $d1 ]),
+       "delete dynamic field");
 }
 
 done_testing();

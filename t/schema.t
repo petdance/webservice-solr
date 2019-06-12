@@ -84,6 +84,23 @@ SKIP:
        "replace dynamic field");
     ok($solr->edit_schema([ delete_dynamic_field => $d1 ]),
        "delete dynamic field");
+
+  SKIP:
+    {
+        eval { require JSON::PP; 1 }
+          or skip "No JSON::PP", 2;
+        %mydef = (
+            %$textt1,
+            name => $t1,
+            indexed => JSON::PP::true(),
+            stored => JSON::PP::false()
+           );
+        ok($solr->edit_schema([ add_type => \%mydef ]),
+           "create a field type (customize with bools)")
+          or diag Dumper($solr->last_response->content);
+        ok($solr->edit_schema([ delete_type => $t1 ]),
+           "and remove it again");
+    }
 }
 
 done_testing();

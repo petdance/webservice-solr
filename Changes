@@ -1,7 +1,9 @@
 Revision history for Perl extension WebService::Solr.
 
 0.44    Fri Jan 10 13:29:02 CST 2020
- - No code changes.  Uploaded only to fix metadata for the distribution.
+ - No code changes.
+ - Fixed URL for the issue tracker.
+ - Updated directories to get response tests to run.
 
 0.42    Tue Apr 25 16:59:02 CDT 2017
  - No changes since 0.41_01

@@ -333,7 +333,7 @@ need.
         -and => { -prohibit => 'bar' }, { -require => 'baz' }
     ] } );
     # RESULT: (((-foo:"bar") AND (+foo:"baz")))
-    
+
     my $q = WebService::Solr::Query->new( { foo => [
         -or => { -require => 'bar' }, { -prohibit => 'baz' }
     ] } );
@@ -350,7 +350,7 @@ To search the default field, use the C<-default> prefix.
 
     my $q = WebService::Solr::Query->new( { foo => { -require => 'bar' } } );
     # RESULT: (+foo:"bar")
-    
+
     my $q = WebService::Solr::Query->new( { foo => { -prohibit => 'bar' } } );
     # RESULT: (-foo:"bar")
 
@@ -362,7 +362,7 @@ C<-range_inc>.
 
     my $q = WebService::Solr::Query->new( { foo => { -range => ['a', 'z'] } } );
     # RESULT: (+foo:[a TO z])
-    
+
     my $q = WebService::Solr::Query->new( { foo => { -range_exc => ['a', 'z'] } } );
     # RESULT: (+foo:{a TO z})
 
@@ -441,13 +441,16 @@ Moo method to handle input to C<new()>.
 
 =head1 AUTHORS
 
+Andy Lester C<andy@petdance.com>
+
 Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
 Jos Boumans E<lt>kane@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2017 National Adult Literacy Database
+Copyright 2008-2014 National Adult Literacy Database
+Copyright 2015-2020 Andy Lester
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

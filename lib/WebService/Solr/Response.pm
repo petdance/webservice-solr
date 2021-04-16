@@ -2,11 +2,18 @@ package WebService::Solr::Response;
 
 use Moo;
 
-use Types::Standard qw(Object HashRef Maybe InstanceOf ArrayRef);
+use Types::Standard qw(Object HashRef Maybe InstanceOf ArrayRef Bool);
 use WebService::Solr::Document;
 use Data::Page;
 use Data::Pageset;
 use JSON::XS ();
+use JSON::PP ();
+
+has 'PP' => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 0
+);
 
 has 'raw_response' => (
     is      => 'ro',
@@ -38,15 +45,19 @@ has '_pageset_fixed' =>
     ( is => 'rw', isa => Maybe[InstanceOf['Data::Pageset']], predicate => 1 );
 
 sub BUILDARGS {
-    my ( $self, $res ) = @_;
-    return { raw_response => $res };
+    my ( $self, $res, %options ) = @_;
+    return { raw_response => $res, %options };
 }
 
 sub _build_content {
     my $self    = shift;
     my $content = $self->raw_response->content;
     return {} unless $content;
-    my $rv = eval { JSON::XS::decode_json( $content ) };
+    my $rv;
+    if($self->{PP})
+    { $rv = eval { JSON::PP::decode_json( $content ) }; }
+    else
+    { $rv = eval { JSON::XS::decode_json( $content ) }; }
 
     ### JSON::XS throw an exception, but kills most of the content
     ### in the diagnostic, making it hard to track down the problem

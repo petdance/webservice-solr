@@ -157,6 +157,90 @@ sub search {
     return $self->generic_solr_request( 'select', $params );
 }
 
+sub schema {
+  my $self = shift;
+  my $url = $self->_gen_url( 'schema' );
+
+  my $resp = $self->last_response(
+    WebService::Solr::Response->new(
+      $self->agent->get($url)));
+
+  return $resp->is_success ? $resp->content->{schema} : ();
+}
+
+sub edit_schema {
+    my $self = shift;
+    my $actions = shift
+      or confess 'Usage: edit_schema(\@actions)';
+    my $i = 0;
+
+    # horribly, Solr likes multiple keys with the same name in its
+    # json objects
+    my @json;
+    my $j = JSON::XS->new;
+    while ($i < @$actions) {
+        my ($action, $params) = @$actions[$i, $i+1];
+
+        $params = [ $params ] if ref $params ne 'ARRAY';
+
+        if ($action =~ /^add[-_]?field$/) {
+            push @json, '"add-field":' . $j->encode($params);
+        }
+        elsif ($action =~ /^replace[-_]?field$/) {
+            push @json, '"replace-field":' . $j->encode($params);
+        }
+        elsif ($action =~ /^delete[-_]?field$/) {
+            # treat simple scalars as field names
+            my $tmp = [ map {; ref ? $_ : +{ name => $_ } } @$params ];
+            push @json, '"delete-field":' . $j->encode($tmp);
+        }
+        elsif ($action =~ /^add[-_]?dynamic(?:[-_]?field)?$/) {
+            push @json, '"add-dynamic-field":' . $j->encode($params);
+        }
+        elsif ($action =~ /^replace[-_]?dynamic(?:[-_]?field)?$/) {
+            push @json, '"replace-dynamic-field":' . $j->encode($params);
+        }
+        elsif ($action =~ /^delete[-_]?dynamic(?:[-_]?field)?$/) {
+            # treat simple scalars as field names
+            my $tmp = [ map {; ref ? $_ : +{ name => $_ } } @$params ];
+            push @json, '"delete-dynamic-field":' . $j->encode($tmp);
+        }
+        elsif ($action =~ /^add[-_]?(?:field[-_]?)?type$/) {
+            push @json, '"add-field-type":' . $j->encode($params);
+        }
+        elsif ($action =~ /^replace[-_]?(?:field[-_]?)?type$/) {
+            push @json, '"replace-field-type":' . $j->encode($params);
+        }
+        elsif ($action =~ /^delete[-_]?(?:field[-_]?)?type$/) {
+            my $tmp = [ map {; ref ? $_ : +{ name => $_ } } @$params ];
+            push @json, '"delete-field-type":' . $j->encode($tmp);
+        }
+        elsif ($action =~ /^add[-_]?copy(?:[-_]?field)?$/) {
+            push @json, '"add-copy-field":' . $j->encode($params);
+        }
+        elsif ($action =~ /^delete[-_]?copy(?:[-_]?field)?$/) {
+            push @json, '"delete-copy-field":' . $j->encode($params);
+        }
+        else {
+            confess "Unknown action $action";
+        }
+
+        $i += 2;
+    }
+    # We need to build our JSON here to ensure that changes are done in the requested
+    # order, since Solr seems to allow duplicate keys and preservation of ordering
+    # in its JSON.
+    # I'd use XML, but the schema API doesn't appear to support it.
+    my $json = '{' . join(",", @json) . '}';
+
+    return $self->last_response(
+        WebService::Solr::Response->new(
+            $self->agent->post(
+                $self->_gen_url( 'schema' ),
+                Content_Type => 'application/json',
+                Content => $json ) ) )->is_success();
+}
+
 sub auto_suggest {
     shift->generic_solr_request( 'autoSuggest', @_ );
 }
@@ -380,6 +464,128 @@ Options as of Solr 1.4 are the same as C<commit()>.
 =head2 ping( )
 
 Sends a basic ping request. Returns true on success, false otherwise.
+
+=head2 schema
+
+Fetch the schema of the collection.
+
+=head2 edit_schema( \@actions )
+
+Simple wrapper around the schema API.  C<@actions> contains an ordered
+list of schema changes to make, where each change includes the type of
+change followed by a hash, or array of hashes containing the changes,
+for example:
+
+  use JSON::PP; # for true, false
+  my $res = $solr->edit_schema([ add_field =>
+                                   {
+                                       name => "foo",
+                                       type => "text_en"
+                                       stored => JSON::PP::true
+                                   }
+                               ]);
+
+  my $res = $solr->edit_schema([ add_field =>
+                                   [
+                                       {
+                                           name => "foo",
+                                           type => "text_en"
+                                       },
+                                       {
+                                           name => "bar",
+                                           type => "strings"
+                                       }
+                                   ]
+                               ]);
+
+  my $res = $solr->edit_schema([ add_type =>
+                                   {
+                                       name => "mytype",
+                                       class => "solr.StrField",
+                                       docValues => JSON::PP::true
+                                   },
+                                 add_field =>
+                                   {
+                                       name => "foo",
+                                       type => "mytype"
+                                   }
+                               ]);
+
+All requests are done in a single request to the Solr server, and in
+the order supplied, so you need to add new types before you add a
+field of that type.
+
+The schema operations supported are:
+
+=over
+
+=item *
+
+C<add_field>
+
+=item *
+
+C<add_type> aka C<add_field_type>
+
+=item *
+
+C<add_dynamic> aka C<add_dynamic_field>
+
+=item *
+
+C<add_copy> aka C<add_copy_field>
+
+Add a field, type, dynamic field or copy field respectively.
+
+=item *
+
+C<replace_field>
+
+=item *
+
+C<replace_type> aka C<replace_field_type>
+
+=item *
+
+C<replace_dynamic> aka C<replace_dynamic_field>
+
+Replace a field, type or dynamic field respectively.
+
+=item *
+
+C<delete_field>
+
+=item *
+
+C<delete_type> aka C<delete_field_type>
+
+=item *
+
+C<delete_dynamic> aka C<delete_dynamic_field>
+
+Delete a field, a type or a dynamic field respectively.
+
+You supply just the field name for these delete operations:
+
+  # delete fields foo and bar
+  $solr->edit_schema([ delete_field => [ "foo", "bar" ] ]);
+
+=item *
+
+C<delete_copy> aka C<delete_copy_field>
+
+Delete a copy field.
+
+=back
+
+In all cases an underscore (C<_>) in the operation name can be
+replaced with dash (C<->) to match the API.
+
+The longer names match the API, while the shorter names allow for
+brevity.
+
+See F<examples/deploy_schema.pl> for a sample that deploys a JSON
+schema to a core.
 
 =head2 generic_solr_request( $path, \%query )
 

@@ -1,0 +1,31 @@
+language: perl
+
+env:
+  global:
+    - SOLR_SERVER=http://127.0.0.1:8983/solr/test
+    - SOLR_TEST_SCHEMA_EDITS=1
+
+services:
+  - docker
+
+before_install:
+  - docker pull solr:latest
+  - docker run -d -p 127.0.0.1:8983:8983 -t --name test_solr solr
+  - docker exec -it --user=solr test_solr bin/solr create_core -c test
+  - docker exec -it --user=solr test_solr bin/solr config -c test -p 8983 -action set-user-property -property update.autoCreateFields -value false
+
+matrix:
+  include:
+    - perl: '5.26'
+    - perl: '5.28'
+
+# test without server
+    - perl: '5.28'
+      env:
+        - SOLR_SERVER=
+
+install:
+  - cpanm --quiet --installdeps --notest .
+
+script:
+  - perl Makefile.PL && make test
